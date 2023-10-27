@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.RuleinformationMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Ruleinformation">
+            <id property="cRIRuleId" column="cRIRuleId" jdbcType="VARCHAR"/>
+            <result property="cRIRule" column="cRIRule" jdbcType="VARCHAR"/>
+            <result property="cRIRuleCategory" column="cRIRuleCategory" jdbcType="VARCHAR"/>
+            <result property="iRICurrentSequence" column="iRICurrentSequence" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cRIRuleId,cRIRule,cRIRuleCategory,
+        iRICurrentSequence
+    </sql>
+</mapper>

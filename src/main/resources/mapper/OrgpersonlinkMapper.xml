@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.OrgpersonlinkMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Orgpersonlink">
+            <id property="cOPL_cOICode" column="cOPL_cOICode" jdbcType="VARCHAR"/>
+            <id property="cOPL_cPICode" column="cOPL_cPICode" jdbcType="VARCHAR"/>
+            <result property="dOPLCreationTime" column="dOPLCreationTime" jdbcType="TIMESTAMP"/>
+            <result property="cOPLCreatedBy" column="cOPLCreatedBy" jdbcType="VARCHAR"/>
+            <result property="cOPLPermissionSet" column="cOPLPermissionSet" jdbcType="VARCHAR"/>
+            <result property="iOPLPersonStatus" column="iOPLPersonStatus" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cOPL_cOICode,cOPL_cPICode,dOPLCreationTime,
+        cOPLCreatedBy,cOPLPermissionSet,iOPLPersonStatus
+    </sql>
+</mapper>

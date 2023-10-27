@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.OrganizationinfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Organizationinfo">
+            <id property="cOICode" column="cOICode" jdbcType="VARCHAR"/>
+            <result property="cOIOrgCode" column="cOIOrgCode" jdbcType="VARCHAR"/>
+            <result property="cOIOrgName" column="cOIOrgName" jdbcType="VARCHAR"/>
+            <result property="cOIOrgDescription" column="cOIOrgDescription" jdbcType="VARCHAR"/>
+            <result property="cOIOrgType" column="cOIOrgType" jdbcType="VARCHAR"/>
+            <result property="bOIIsPublicVisible" column="bOIIsPublicVisible" jdbcType="BIT"/>
+            <result property="iOISubLevelSequence" column="iOISubLevelSequence" jdbcType="INTEGER"/>
+            <result property="dOICreationTime" column="dOICreationTime" jdbcType="TIMESTAMP"/>
+            <result property="cOI_cPICode" column="cOI_cPICode" jdbcType="VARCHAR"/>
+            <result property="cOIManagerCode" column="cOIManagerCode" jdbcType="VARCHAR"/>
+            <result property="bOIIsUserVerified" column="bOIIsUserVerified" jdbcType="BIT"/>
+            <result property="cOIOrgManagementPerm" column="cOIOrgManagementPerm" jdbcType="VARCHAR"/>
+            <result property="cOIAddUserPerm" column="cOIAddUserPerm" jdbcType="VARCHAR"/>
+            <result property="cOIDeleteUserPerm" column="cOIDeleteUserPerm" jdbcType="VARCHAR"/>
+            <result property="cOIAssignPermPerm" column="cOIAssignPermPerm" jdbcType="VARCHAR"/>
+            <result property="cOIManageFilePerm" column="cOIManageFilePerm" jdbcType="VARCHAR"/>
+            <result property="bOIIsPublicOrgFile" column="bOIIsPublicOrgFile" jdbcType="BIT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cOICode,cOIOrgCode,cOIOrgName,
+        cOIOrgDescription,cOIOrgType,bOIIsPublicVisible,
+        iOISubLevelSequence,dOICreationTime,cOI_cPICode,
+        cOIManagerCode,bOIIsUserVerified,cOIOrgManagementPerm,
+        cOIAddUserPerm,cOIDeleteUserPerm,cOIAssignPermPerm,
+        cOIManageFilePerm,bOIIsPublicOrgFile
+    </sql>
+</mapper>

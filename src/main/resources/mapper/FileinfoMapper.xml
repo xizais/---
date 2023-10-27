@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.FileinfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Fileinfo">
+            <id property="cFICode" column="cFICode" jdbcType="VARCHAR"/>
+            <result property="cFIFileName" column="cFIFileName" jdbcType="VARCHAR"/>
+            <result property="cFIMD5Code" column="cFIMD5Code" jdbcType="VARCHAR"/>
+            <result property="cFIFilePath" column="cFIFilePath" jdbcType="VARCHAR"/>
+            <result property="dFICreateTime" column="dFICreateTime" jdbcType="TIMESTAMP"/>
+            <result property="cFI_cPICode" column="cFI_cPICode" jdbcType="VARCHAR"/>
+            <result property="cFIDescription" column="cFIDescription" jdbcType="VARCHAR"/>
+            <result property="iFIFileSize" column="iFIFileSize" jdbcType="BIGINT"/>
+            <result property="cFIMimeType" column="cFIMimeType" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cFICode,cFIFileName,cFIMD5Code,
+        cFIFilePath,dFICreateTime,cFI_cPICode,
+        cFIDescription,iFIFileSize,cFIMimeType
+    </sql>
+</mapper>

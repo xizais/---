@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.OrgpersontagMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Orgpersontag">
+            <id property="cOPTTagId" column="cOPTTagId" jdbcType="VARCHAR"/>
+            <result property="cOPTTagName" column="cOPTTagName" jdbcType="VARCHAR"/>
+            <result property="cOPT_cPICode" column="cOPT_cPICode" jdbcType="VARCHAR"/>
+            <result property="dOPTCreationTime" column="dOPTCreationTime" jdbcType="TIMESTAMP"/>
+            <result property="cOPTIncludedOrgId" column="cOPTIncludedOrgId" jdbcType="VARCHAR"/>
+            <result property="cOPTIncludedPersonCode" column="cOPTIncludedPersonCode" jdbcType="VARCHAR"/>
+            <result property="bOPTIsEnabled" column="bOPTIsEnabled" jdbcType="BIT"/>
+            <result property="bOPTIsSystemShared" column="bOPTIsSystemShared" jdbcType="BIT"/>
+            <result property="bOPTIsOrgShared" column="bOPTIsOrgShared" jdbcType="BIT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cOPTTagId,cOPTTagName,cOPT_cPICode,
+        dOPTCreationTime,cOPTIncludedOrgId,cOPTIncludedPersonCode,
+        bOPTIsEnabled,bOPTIsSystemShared,bOPTIsOrgShared
+    </sql>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.PersoninfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Personinfo">
+            <id property="cPICode" column="cPICode" jdbcType="VARCHAR"/>
+            <result property="cPIName" column="cPIName" jdbcType="VARCHAR"/>
+            <result property="cPIGender" column="cPIGender" jdbcType="OTHER"/>
+            <result property="dPIBirthDate" column="dPIBirthDate" jdbcType="DATE"/>
+            <result property="cPIHometown" column="cPIHometown" jdbcType="VARCHAR"/>
+            <result property="cPIContactNumber" column="cPIContactNumber" jdbcType="VARCHAR"/>
+            <result property="cPIEmail" column="cPIEmail" jdbcType="VARCHAR"/>
+            <result property="cPIIDType" column="cPIIDType" jdbcType="VARCHAR"/>
+            <result property="cPIIDNumber" column="cPIIDNumber" jdbcType="VARCHAR"/>
+            <result property="cPIIdentity" column="cPIIdentity" jdbcType="VARCHAR"/>
+            <result property="cPI_cOICode" column="cPI_cOICode" jdbcType="VARCHAR"/>
+            <result property="dPICreateTime" column="dPICreateTime" jdbcType="TIMESTAMP"/>
+            <result property="cPIPassword" column="cPIPassword" jdbcType="VARCHAR"/>
+            <result property="bPIIsEnabled" column="bPIIsEnabled" jdbcType="BIT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cPICode,cPIName,cPIGender,
+        dPIBirthDate,cPIHometown,cPIContactNumber,
+        cPIEmail,cPIIDType,cPIIDNumber,
+        cPIIdentity,cPI_cOICode,dPICreateTime,
+        cPIPassword,bPIIsEnabled
+    </sql>
+</mapper>
