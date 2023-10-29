@@ -4,7 +4,7 @@
 1. 初始化工具springboot中redis的使用包括指定序列化和反序列化
 2. 引入与完善stringutils工具类
 3. 统一请求返回格式、异常处理、编码格式等
-4. 整合了redis（但未整合spring cache 与 redis的分布式锁）
+4. 整合了redis的应用（但未整合spring cache 与 redis的分布式锁）
 
 #### 20231027后端项目
 1. 整合Knife4+Swagger自动生成后端接口文档**√**
