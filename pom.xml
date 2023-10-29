@@ -73,6 +73,31 @@
             <version>${knife4j-spring-boot-starter.version}</version>
         </dependency>
         <!--swagger2 end-->
+<!-- ~~~~~~~~~~~~~Redis的使用~~~~~~~~~~~~~~~ -->
+<!--    Spring Data Redis start-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+<!--    Spring Data Redis end-->
+<!--        JSONObject 数据处理-->
+<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.51</version>
+        </dependency>
+<!--        Hutool工具类库-hutool-core-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.3.10</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.3.10</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
