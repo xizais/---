@@ -13,13 +13,13 @@ import java.util.ArrayList;
 @Service
 public class CollectInfoServiceImpl implements CollectInfoService {
     @Override
-    public JSONObject saveCollectInfo(ArrayList<JSONObject> fromDatas) {
+    public JSONObject saveCollectInfo(ArrayList<JSONObject> containers,boolean isAdd) {
         JSONObject result = new JSONObject();
         // 检查数据
 
         // 保存数据
 
-        for (JSONObject fromData : fromDatas) {
+        for (JSONObject fromData : containers) {
             // 保存表单容器
 
             // 保存表单元素

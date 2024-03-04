@@ -1,11 +1,11 @@
 //package com.example.teamassistantbackend.aop;
 //
 //import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-//import com.xizai.universalbackend.annotation.AuthCheck;
-//import com.xizai.universalbackend.common.ErrorCode;
-//import com.xizai.universalbackend.exception.BusinessException;
-//import com.xizai.universalbackend.model.entity.User;
-//import com.xizai.universalbackend.service.UserService;
+//import com.example.teamassistantbackend.annotation.AuthCheck;
+//import com.example.teamassistantbackend.common.ErrorCode;
+//import com.example.teamassistantbackend.exception.BusinessException;
+//import com.example.teamassistantbackend.model.entity.User;
+//import com.example.teamassistantbackend.service.UserService;
 //import org.apache.commons.lang3.StringUtils;
 //import org.aspectj.lang.ProceedingJoinPoint;
 //import org.aspectj.lang.annotation.Around;
