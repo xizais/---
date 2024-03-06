@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.InfoformcreateMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Infoformcreate">
+            <id property="iIFCId" column="iIFCId" jdbcType="INTEGER"/>
+            <result property="iIFC_iFId" column="iIFC_iFId" jdbcType="INTEGER"/>
+            <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="containerId" column="containerId" jdbcType="INTEGER"/>
+            <result property="width" column="width" jdbcType="VARCHAR"/>
+            <result property="height" column="height" jdbcType="VARCHAR"/>
+            <result property="showBorder" column="showBorder" jdbcType="VARCHAR"/>
+            <result property="borderWidth" column="borderWidth" jdbcType="VARCHAR"/>
+            <result property="showRadius" column="showRadius" jdbcType="VARCHAR"/>
+            <result property="borderRadius" column="borderRadius" jdbcType="VARCHAR"/>
+            <result property="marginTop" column="marginTop" jdbcType="VARCHAR"/>
+            <result property="marginBottom" column="marginBottom" jdbcType="VARCHAR"/>
+            <result property="marginLeft" column="marginLeft" jdbcType="VARCHAR"/>
+            <result property="marginRight" column="marginRight" jdbcType="VARCHAR"/>
+            <result property="textType" column="textType" jdbcType="VARCHAR"/>
+            <result property="fontSize" column="fontSize" jdbcType="VARCHAR"/>
+            <result property="fontWeight" column="fontWeight" jdbcType="VARCHAR"/>
+            <result property="fontFamily" column="fontFamily" jdbcType="VARCHAR"/>
+            <result property="defaultText" column="defaultText" jdbcType="VARCHAR"/>
+            <result property="textAlign" column="textAlign" jdbcType="VARCHAR"/>
+            <result property="textColor" column="textColor" jdbcType="VARCHAR"/>
+            <result property="placeholder" column="placeholder" jdbcType="VARCHAR"/>
+            <result property="maxLength" column="maxLength" jdbcType="VARCHAR"/>
+            <result property="OPTIONS" column="OPTIONS" jdbcType="VARCHAR"/>
+            <result property="defaultTime" column="defaultTime" jdbcType="TIMESTAMP"/>
+            <result property="isNeed" column="isNeed" jdbcType="VARCHAR"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iIFCId,iIFC_iFId,id,
+        containerId,width,height,
+        showBorder,borderWidth,showRadius,
+        borderRadius,marginTop,marginBottom,
+        marginLeft,marginRight,textType,
+        fontSize,fontWeight,fontFamily,
+        defaultText,textAlign,textColor,
+        placeholder,maxLength,OPTIONS,
+        defaultTime,isNeed,type
+    </sql>
+</mapper>

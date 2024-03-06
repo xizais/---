@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.InfoformMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Infoform">
+            <id property="iIFId" column="iIFId" jdbcType="INTEGER"/>
+            <result property="cIF_cPICode_insert" column="cIF_cPICode_insert" jdbcType="VARCHAR"/>
+            <result property="cIFTableName" column="cIFTableName" jdbcType="VARCHAR"/>
+            <result property="cIFCreateTime" column="cIFCreateTime" jdbcType="TIMESTAMP"/>
+            <result property="cIF_cPICode_update" column="cIF_cPICode_update" jdbcType="VARCHAR"/>
+            <result property="cIFUpdateTime" column="cIFUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="cIFState" column="cIFState" jdbcType="VARCHAR"/>
+            <result property="cIFManager" column="cIFManager" jdbcType="VARCHAR"/>
+            <result property="cIFPubStaff" column="cIFPubStaff" jdbcType="VARCHAR"/>
+            <result property="cIFPubOrg" column="cIFPubOrg" jdbcType="VARCHAR"/>
+            <result property="cIFPubFlag" column="cIFPubFlag" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iIFId,cIF_cPICode_insert,cIFTableName,
+        cIFCreateTime,cIF_cPICode_update,cIFUpdateTime,
+        cIFState,cIFManager,cIFPubStaff,
+        cIFPubOrg,cIFPubFlag,dataState
+    </sql>
+</mapper>
