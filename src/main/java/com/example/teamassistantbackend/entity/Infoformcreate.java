@@ -25,7 +25,7 @@ public class Infoformcreate implements Serializable {
     /**
      * 表单配置表主键
      */
-    private Integer iIFC_iFId;
+    private Integer iIFC_iIFId;
 
     /**
      * 页面容器|元素主键

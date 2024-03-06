@@ -4,15 +4,11 @@ import java.util.Date;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.teamassistantbackend.entity.Fileinfo;
 import com.example.teamassistantbackend.entity.Infoform;
 import com.example.teamassistantbackend.entity.Infoformcreate;
-import com.example.teamassistantbackend.mapper.FileinfoMapper;
 import com.example.teamassistantbackend.mapper.InfoformMapper;
 import com.example.teamassistantbackend.mapper.InfoformcreateMapper;
 import com.example.teamassistantbackend.service.CollectInfoService;
-import com.example.teamassistantbackend.service.FileinfoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +25,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     public JSONObject saveCollectInfo(ArrayList<JSONObject> containers,boolean isAdd,int iIFId) {
         JSONObject result = new JSONObject();
         // 1. 检查数据
+
 
         // 2. 数据处理
         // 2.2 创建配置表
@@ -60,9 +57,9 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         // 2.3 存储数据
         for (JSONObject fromData : containers) {
             int containerId = 0;
-            // 保存表单容器
+            // 2.3.1 保存表单容器
             Infoformcreate containerForm = new Infoformcreate();
-            containerForm.setIIFC_iFId(iIFId);
+            containerForm.setIIFC_iIFId(iIFId);
             containerForm.setId(fromData.getInteger("id"));
             containerForm.setContainerId(containerId);
             containerForm.setWidth(fromData.getString("width"));
@@ -75,10 +72,37 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             infoformcreateMapper.insert(containerForm);
             containerId = containerForm.getIIFCId();
 
-            // 保存容器内元素
+            // 2.3.2 保存容器内元素
             ArrayList<JSONObject> metas = (ArrayList<JSONObject>)fromData.get("child");
             for (JSONObject meta : metas) {
                 Infoformcreate metaForm = new Infoformcreate();
+                metaForm.setIIFC_iIFId(iIFId);
+                metaForm.setId(meta.getInteger("id"));
+                metaForm.setContainerId(containerId);
+                metaForm.setWidth(meta.getString("width"));
+                metaForm.setHeight(meta.getString("height"));
+                metaForm.setShowBorder(meta.getString("showBorder"));
+                metaForm.setBorderWidth(meta.getString("borderWidth"));
+                metaForm.setShowRadius(meta.getString("showRadius"));
+                metaForm.setBorderRadius(meta.getString("borderRadius"));
+                metaForm.setMarginTop(meta.getString("marginTop"));
+                metaForm.setMarginBottom(meta.getString("marginBottom"));
+                metaForm.setMarginLeft(meta.getString("marginLeft"));
+                metaForm.setMarginRight(meta.getString("marginRight"));
+                metaForm.setTextType(meta.getString("textType"));
+                metaForm.setFontSize(meta.getString("fontSize"));
+                metaForm.setFontWeight(meta.getString("fontWeight"));
+                metaForm.setFontFamily(meta.getString("fontFamily"));
+                metaForm.setDefaultText(meta.getString("defaultText"));
+                metaForm.setTextAlign(meta.getString("textAlign"));
+                metaForm.setTextColor(meta.getString("textColor"));
+                metaForm.setPlaceholder(meta.getString("placeholder"));
+                metaForm.setMaxLength(meta.getString("maxLength"));
+                metaForm.setOPTIONS(meta.getString("options"));
+                metaForm.setDefaultTime(meta.getDate("defaultTime"));
+                metaForm.setIsNeed(meta.getString("isNeed"));
+                metaForm.setType(meta.getString("type"));
+                infoformcreateMapper.insert(metaForm);
             }
         }
 

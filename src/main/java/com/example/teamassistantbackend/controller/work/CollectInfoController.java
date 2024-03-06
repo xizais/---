@@ -25,7 +25,7 @@ public class CollectInfoController {
      */
     @RequestMapping("/saveCollectDesign")
     @ResponseBody
-    public BaseResponse saveCollectDesign(@RequestBody JSONObject request){
+    public BaseResponse<JSONObject> saveCollectDesign(@RequestBody JSONObject request){
         ArrayList<JSONObject> containerData = (ArrayList<JSONObject>)request.get("container");
         if (containerData.isEmpty()) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR,"不允许创建空表单！");
