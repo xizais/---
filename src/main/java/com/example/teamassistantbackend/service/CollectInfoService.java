@@ -5,5 +5,5 @@ import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
 
 public interface CollectInfoService {
-    public JSONObject saveCollectInfo(ArrayList<JSONObject> containers,boolean isAdd);
+    public JSONObject saveCollectInfo(ArrayList<JSONObject> containers,boolean isAdd,int iIFId);
 }

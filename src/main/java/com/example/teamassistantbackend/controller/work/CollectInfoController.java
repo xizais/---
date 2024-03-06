@@ -30,7 +30,7 @@ public class CollectInfoController {
         if (containerData.isEmpty()) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR,"不允许创建空表单！");
         }
-        JSONObject result = collectInfoService.saveCollectInfo(containerData,"add".equals(request.get("state")));
+        JSONObject result = collectInfoService.saveCollectInfo(containerData,"add".equals(request.get("state")), request.getInteger("iIFId"));
         if (result.get("msg")!=null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,(String)result.get("msg"));
         } else {
@@ -39,7 +39,7 @@ public class CollectInfoController {
     }
 
     /**
-     * 保存表单发布配置
+     * 保存表单发布配置（发布）
      */
     @RequestMapping("/saveCollectSetting")
     @ResponseBody
@@ -47,7 +47,7 @@ public class CollectInfoController {
         if (((ArrayList<JSONObject>)request.get("container")).size() == 0) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR,"不允许创建空表单！");
         }
-        JSONObject result = collectInfoService.saveCollectInfo((ArrayList<JSONObject>)request.get("container"),true);
+        JSONObject result = collectInfoService.saveCollectInfo((ArrayList<JSONObject>)request.get("container"),true,1);
         if (result.get("msg")!=null) {
             return ResultUtils.error(ErrorCode.OPERATION_ERROR,(String)request.get("msg"));
         } else {
