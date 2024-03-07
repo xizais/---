@@ -1,7 +1,12 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.teamassistantbackend.entity.Infoformcreate;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.ArrayList;
 
 /**
 * @author huang
@@ -11,6 +16,9 @@ import com.example.teamassistantbackend.entity.Infoformcreate;
 */
 public interface InfoformcreateMapper extends BaseMapper<Infoformcreate> {
 
+    ArrayList<JSONObject> getContainerInfo(String iIFId);// 根据表单配置ID获取表单容器信息
+
+    ArrayList<JSONObject> getChildInfo(@Param(value = "iIFId") String iIFId,@Param(value = "iIFCId") String iIFCId);
 }
 
 

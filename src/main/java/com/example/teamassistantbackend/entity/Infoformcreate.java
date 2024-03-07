@@ -135,7 +135,7 @@ public class Infoformcreate implements Serializable {
     /**
      * 选项值（建议直接存json数组）
      */
-    private String OPTIONS;
+    private String options;
 
     /**
      * 默认时间

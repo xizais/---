@@ -45,4 +45,10 @@
         placeholder,maxLength,OPTIONS,
         defaultTime,isNeed,type
     </sql>
+    <select id="getContainerInfo" resultType="com.alibaba.fastjson.JSONObject">
+        select * from infoformcreate where iIFC_iIFId = #{iIFId} and type = 'container';
+    </select>
+    <select id="getChildInfo" resultType="com.alibaba.fastjson.JSONObject">
+        select * from infoformcreate where iIFC_iIFId = #{iIFId} and containerId = #{iIFCId};
+    </select>
 </mapper>

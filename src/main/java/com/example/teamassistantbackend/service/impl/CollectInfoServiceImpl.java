@@ -4,11 +4,15 @@ import java.util.Date;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.teamassistantbackend.common.ErrorCode;
 import com.example.teamassistantbackend.entity.Infoform;
 import com.example.teamassistantbackend.entity.Infoformcreate;
+import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.mapper.InfoformMapper;
 import com.example.teamassistantbackend.mapper.InfoformcreateMapper;
 import com.example.teamassistantbackend.service.CollectInfoService;
+import com.example.teamassistantbackend.utils.StringUtils;
+import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -70,6 +74,10 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             containerForm.setBorderWidth(fromData.getString("borderWidth"));
             containerForm.setShowRadius(fromData.getString("showRadius"));
             containerForm.setBorderRadius(fromData.getString("borderRadius"));
+            containerForm.setMarginTop(fromData.getString("marginTop"));
+            containerForm.setMarginBottom(fromData.getString("marginBottom"));
+            containerForm.setMarginLeft(fromData.getString("marginLeft"));
+            containerForm.setMarginRight(fromData.getString("marginRight"));
             containerForm.setType(fromData.getString("type"));
             infoformcreateMapper.insert(containerForm);
             containerId = containerForm.getIIFCId();
@@ -101,7 +109,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
                 metaForm.setTextColor(meta.getString("textColor"));
                 metaForm.setPlaceholder(meta.getString("placeholder"));
                 metaForm.setMaxLength(meta.getString("maxLength"));
-                metaForm.setOPTIONS(meta.getString("options"));
+                metaForm.setOptions(meta.getString("options"));
                 metaForm.setDefaultTime(meta.getDate("defaultTime"));
                 metaForm.setIsNeed(meta.getString("isNeed"));
                 metaForm.setType(meta.getString("type"));
@@ -120,6 +128,32 @@ public class CollectInfoServiceImpl implements CollectInfoService {
 
     @Override
     public JSONObject getInfo(String iIFId) {
-        return null;
+        if (StringUtils.isEmpty(iIFId)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        ArrayList<JSONObject> containers = infoformcreateMapper.getContainerInfo(iIFId);
+        for (JSONObject container : containers) {
+            // 封装容器元素
+            ArrayList<JSONObject> childs = infoformcreateMapper.getChildInfo(iIFId,container.getString("iIFCId"));
+            if (!childs.isEmpty()) {
+                // 处理option数据
+                for (JSONObject child : childs) {
+                    if (!StringUtils.isEmpty(child.getString("options"))) {
+                        Gson gson = new Gson();
+                        child.put("options",gson.fromJson(child.getString("options"), JSONObject.class));
+                    }
+                }
+                container.put("child",childs);
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.put("containers",containers);
+        return result;
+    }
+    public static void main(String[] args) {
+        String jsonString = "[{\"id\":0,\"content\":\"选项一\"},{\"id\":3,\"content\":\"2\"},{\"id\":4,\"content\":\"3\"}]";
+
+        JSONArray jsonArray = JSONArray.parseArray(jsonString);
+        System.out.println(jsonArray);
     }
 }

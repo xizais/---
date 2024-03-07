@@ -70,7 +70,7 @@ public class CollectInfoController {
      */
     @RequestMapping("/getCollectInfo")
     @ResponseBody
-    public BaseResponse<JSONObject> getCollectInfo(String iIFId){
-        return ResultUtils.success(collectInfoService.getInfo(iIFId));
+    public BaseResponse<JSONObject> getCollectInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.getInfo(request.getString("iIFId")));
     }
 }
