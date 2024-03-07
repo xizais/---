@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Service
 public class CollectInfoServiceImpl implements CollectInfoService {
@@ -22,7 +23,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     InfoformcreateMapper infoformcreateMapper;// 表单创建
 
     @Override
-    public JSONObject saveCollectInfo(ArrayList<JSONObject> containers,boolean isAdd,int iIFId) {
+    public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId) {
         JSONObject result = new JSONObject();
         // 1. 检查数据
 
@@ -55,7 +56,8 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         }
 
         // 2.3 存储数据
-        for (JSONObject fromData : containers) {
+        for (HashMap<String,Object> fromDataHash : containers) {
+            JSONObject fromData = new JSONObject(fromDataHash);
             int containerId = 0;
             // 2.3.1 保存表单容器
             Infoformcreate containerForm = new Infoformcreate();
@@ -73,8 +75,9 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             containerId = containerForm.getIIFCId();
 
             // 2.3.2 保存容器内元素
-            ArrayList<JSONObject> metas = (ArrayList<JSONObject>)fromData.get("child");
-            for (JSONObject meta : metas) {
+            ArrayList<HashMap<String,Object>> metas = (ArrayList<HashMap<String,Object>>)fromData.get("child");
+            for (HashMap<String,Object> metaHash : metas) {
+                JSONObject meta = new JSONObject(metaHash);
                 Infoformcreate metaForm = new Infoformcreate();
                 metaForm.setIIFC_iIFId(iIFId);
                 metaForm.setId(meta.getInteger("id"));
@@ -108,5 +111,15 @@ public class CollectInfoServiceImpl implements CollectInfoService {
 
         // 3. 返回结果
         return result;
+    }
+
+    @Override
+    public JSONObject getInfoList() {
+        return null;
+    }
+
+    @Override
+    public JSONObject getInfo(String iIFId) {
+        return null;
     }
 }
