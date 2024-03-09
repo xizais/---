@@ -6,6 +6,7 @@ import com.example.teamassistantbackend.common.ErrorCode;
 import com.example.teamassistantbackend.common.ResultUtils;
 import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.service.CollectInfoService;
+import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,10 +29,17 @@ public class CollectInfoController {
     @ResponseBody
     public BaseResponse<JSONObject> saveCollectDesign(@RequestBody JSONObject request){
         ArrayList<HashMap<String,Object>> containerData = (ArrayList<HashMap<String,Object>>)request.get("container");
-        if (containerData.isEmpty()) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"不允许创建空表单！");
+        if (StringUtils.isEmpty(request.getString("title"))) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"标题不允许为空！");
         }
-        JSONObject result = collectInfoService.saveCollectInfo(containerData,"add".equals(request.get("state")), request.getInteger("iIFId"));
+        if (containerData.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"不允许创建空表单！");
+        }
+        JSONObject result = collectInfoService.saveCollectInfo(
+                containerData,
+                "add".equals(request.get("state")),
+                request.getInteger("iIFId"),
+                request.getString("title"));
         if (result.get("msg")!=null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,(String)result.get("msg"));
         } else {
@@ -61,8 +69,8 @@ public class CollectInfoController {
      */
     @RequestMapping("/getCollectInfoList")
     @ResponseBody
-    public BaseResponse<JSONObject> getCollectInfoList(){
-        return ResultUtils.success(collectInfoService.getInfoList());
+    public BaseResponse<JSONObject> getCollectInfoList(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.getInfoList(request));
     }
 
     /**

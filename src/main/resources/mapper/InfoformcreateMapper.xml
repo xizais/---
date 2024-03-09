@@ -15,7 +15,7 @@
             <result property="borderWidth" column="borderWidth" jdbcType="VARCHAR"/>
             <result property="showRadius" column="showRadius" jdbcType="VARCHAR"/>
             <result property="borderRadius" column="borderRadius" jdbcType="VARCHAR"/>
-            <result property="marginTop" column="marginTop" jdbcType="VARCHAR"/>
+            <result property="marginTop" column="marginTop" jdbcType="INTEGER"/>
             <result property="marginBottom" column="marginBottom" jdbcType="VARCHAR"/>
             <result property="marginLeft" column="marginLeft" jdbcType="VARCHAR"/>
             <result property="marginRight" column="marginRight" jdbcType="VARCHAR"/>
@@ -28,9 +28,10 @@
             <result property="textColor" column="textColor" jdbcType="VARCHAR"/>
             <result property="placeholder" column="placeholder" jdbcType="VARCHAR"/>
             <result property="maxLength" column="maxLength" jdbcType="VARCHAR"/>
-            <result property="OPTIONS" column="OPTIONS" jdbcType="VARCHAR"/>
+            <result property="options" column="options" jdbcType="VARCHAR"/>
             <result property="defaultTime" column="defaultTime" jdbcType="TIMESTAMP"/>
             <result property="isNeed" column="isNeed" jdbcType="VARCHAR"/>
+            <result property="showInnerBorder" column="showInnerBorder" jdbcType="VARCHAR"/>
             <result property="type" column="type" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -50,5 +51,8 @@
     </select>
     <select id="getChildInfo" resultType="com.alibaba.fastjson.JSONObject">
         select * from infoformcreate where iIFC_iIFId = #{iIFId} and containerId = #{iIFCId};
+    </select>
+    <select id="getMetaId" resultType="java.lang.Integer">
+        select max(id) from infoformcreate where iIFC_iIFId = #{iIFId}
     </select>
 </mapper>

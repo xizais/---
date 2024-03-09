@@ -68,6 +68,11 @@ public class Infoformcreate implements Serializable {
     private String borderRadius;
 
     /**
+     * 是否显示内边框
+     */
+    private String showInnerBorder;
+
+    /**
      * 盒子顶部
      */
     private String marginTop;

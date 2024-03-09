@@ -8,6 +8,7 @@
             <id property="iIFId" column="iIFId" jdbcType="INTEGER"/>
             <result property="cIF_cPICode_insert" column="cIF_cPICode_insert" jdbcType="VARCHAR"/>
             <result property="cIFTableName" column="cIFTableName" jdbcType="VARCHAR"/>
+            <result property="cIFTitle" column="cIFTitle" jdbcType="VARCHAR"/>
             <result property="cIFCreateTime" column="cIFCreateTime" jdbcType="TIMESTAMP"/>
             <result property="cIF_cPICode_update" column="cIF_cPICode_update" jdbcType="VARCHAR"/>
             <result property="cIFUpdateTime" column="cIFUpdateTime" jdbcType="TIMESTAMP"/>
@@ -25,4 +26,13 @@
         cIFState,cIFManager,cIFPubStaff,
         cIFPubOrg,cIFPubFlag,dataState
     </sql>
+    <select id="getFromList" resultType="com.alibaba.fastjson.JSONObject">
+        select *,
+               DATE_FORMAT(cIFCreateTime, '%Y-%m-%d') as standerCreateTime,
+               DATE_FORMAT(cIFUpdateTime, '%Y-%m-%d') as standerUpdateTime,
+               DATE_FORMAT(cIFPubTime, '%Y-%m-%d') as standerPubTime
+        from InfoForm
+        where
+            (cIF_cPICode_insert = #{data.cPICode} or FIND_IN_SET(#{data.cPICode}, cIFManager) > 0)
+    </select>
 </mapper>

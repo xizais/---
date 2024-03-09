@@ -19,6 +19,8 @@ public interface InfoformcreateMapper extends BaseMapper<Infoformcreate> {
     ArrayList<JSONObject> getContainerInfo(String iIFId);// 根据表单配置ID获取表单容器信息
 
     ArrayList<JSONObject> getChildInfo(@Param(value = "iIFId") String iIFId,@Param(value = "iIFCId") String iIFCId);
+
+    int getMetaId(String iIFId);
 }
 
 

@@ -1,7 +1,11 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.teamassistantbackend.entity.Infoform;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.ArrayList;
 
 /**
 * @author huang
@@ -11,6 +15,7 @@ import com.example.teamassistantbackend.entity.Infoform;
 */
 public interface InfoformMapper extends BaseMapper<Infoform> {
 
+    ArrayList<JSONObject> getFromList(@Param(value = "data") JSONObject data);// 获取用户的表单配置
 }
 
 

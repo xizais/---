@@ -33,6 +33,16 @@ public class Infoform implements Serializable {
     private String cIFTableName;
 
     /**
+     * 表单发布者（本人、组织等）
+     */
+    private String cIFPuber;
+
+    /**
+     * 表单标题
+     */
+    private String cIFTitle;
+
+    /**
      * 创建时间
      */
     private Date cIFCreateTime;
@@ -46,6 +56,11 @@ public class Infoform implements Serializable {
      * 更新时间
      */
     private Date cIFUpdateTime;
+
+    /**
+     * 发布时间
+     */
+    private Date cIFPubTime ;
 
     /**
      * 表单状态（草稿、新增、发布）

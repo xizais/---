@@ -1,4 +1,5 @@
 package com.example.teamassistantbackend.service.impl;
+import java.util.Arrays;
 import java.util.Date;
 
 import com.alibaba.fastjson.JSONArray;
@@ -12,12 +13,13 @@ import com.example.teamassistantbackend.mapper.InfoformMapper;
 import com.example.teamassistantbackend.mapper.InfoformcreateMapper;
 import com.example.teamassistantbackend.service.CollectInfoService;
 import com.example.teamassistantbackend.utils.StringUtils;
-import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class CollectInfoServiceImpl implements CollectInfoService {
@@ -27,14 +29,15 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     InfoformcreateMapper infoformcreateMapper;// 表单创建
 
     @Override
-    public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId) {
+    public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId, String title) {
         JSONObject result = new JSONObject();
         // 1. 检查数据
-
+//        checkCollectData(containers);
 
         // 2. 数据处理
         // 2.2 创建配置表
-        String curHandler = "111";// 当前处理人
+        String curHandlerCode = "111";// 当前处理人编号
+        String curHandler = "小希";// 当前处理人名称
         Infoform infoform = new Infoform();
         if (!isAdd) {
             infoform = infoformMapper.selectById(iIFId);
@@ -44,11 +47,13 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             infoformcreateMapper.delete(infoformcreateQueryWrapper);
         }
 
+        infoform.setCIFTitle(title);
         infoform.setCIF_cPICode_update(curHandler);// 修改者
         infoform.setCIFUpdateTime(new Date());// 修改时间
 
         if (isAdd) {
-            infoform.setCIF_cPICode_insert(curHandler);// 创建者
+            infoform.setCIF_cPICode_insert(curHandlerCode);// 创建者编号
+            infoform.setCIFPuber(curHandler);// 当前处理人
             infoform.setCIFCreateTime(new Date());// 创建时间
             infoform.setCIFManager(curHandler);// 初始管理员（建议放人员编号吧）
             infoformMapper.insert(infoform);
@@ -112,6 +117,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
                 metaForm.setOptions(meta.getString("options"));
                 metaForm.setDefaultTime(meta.getDate("defaultTime"));
                 metaForm.setIsNeed(meta.getString("isNeed"));
+                metaForm.setShowInnerBorder(meta.getString("showInnerBorder"));
                 metaForm.setType(meta.getString("type"));
                 infoformcreateMapper.insert(metaForm);
             }
@@ -122,8 +128,15 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     }
 
     @Override
-    public JSONObject getInfoList() {
-        return null;
+    public JSONObject getInfoList(JSONObject request) {
+        // 获取当前用户编号
+        String cPICode = "111";
+        request.put("cPICode",cPICode);
+        // 查询用户表单配置信息数据：用户自身的、用户管理的（按时间排序）
+        ArrayList<JSONObject> infoList = infoformMapper.getFromList(request);
+        JSONObject result = new JSONObject();
+        result.put("infoList",infoList);
+        return result;
     }
 
     @Override
@@ -133,27 +146,85 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         }
         ArrayList<JSONObject> containers = infoformcreateMapper.getContainerInfo(iIFId);
         for (JSONObject container : containers) {
+            container.put("showBorder","true".equals(container.getString("showBorder")));
+            container.put("showRadius","true".equals(container.getString("showRadius")));
             // 封装容器元素
             ArrayList<JSONObject> childs = infoformcreateMapper.getChildInfo(iIFId,container.getString("iIFCId"));
             if (!childs.isEmpty()) {
                 // 处理option数据
                 for (JSONObject child : childs) {
+                    child.put("showBorder","true".equals(child.getString("showBorder")));
+                    child.put("showRadius","true".equals(child.getString("showRadius")));
+                    child.put("showInnerBorder","true".equals(child.getString("showInnerBorder")));
+                    child.put("isNeed","true".equals(child.getString("isNeed")));
                     if (!StringUtils.isEmpty(child.getString("options"))) {
-                        Gson gson = new Gson();
-                        child.put("options",gson.fromJson(child.getString("options"), JSONObject.class));
+                        child.put("options",JSONArray.parseArray(convertToJson(child.getString("options"))));
+                    }
+                    if (child.getString("type").equals("checkbox")) {
+                        child.put("defaultText",new ArrayList<>());
                     }
                 }
                 container.put("child",childs);
             }
         }
         JSONObject result = new JSONObject();
-        result.put("containers",containers);
+        Infoform infoForm = infoformMapper.selectById(iIFId);
+        int maxMetaId = infoformcreateMapper.getMetaId(iIFId);
+        result.put("infoForm",infoForm);// 表单配置信息
+        result.put("containers",containers);// 表单元素信息
+        result.put("maxMetaId",maxMetaId);// 元素最大值ID
+        result.put("authority",checkAuthority(infoForm));// 当前登入人是否是管理员或者创建者
         return result;
     }
-    public static void main(String[] args) {
-        String jsonString = "[{\"id\":0,\"content\":\"选项一\"},{\"id\":3,\"content\":\"2\"},{\"id\":4,\"content\":\"3\"}]";
 
-        JSONArray jsonArray = JSONArray.parseArray(jsonString);
-        System.out.println(jsonArray);
+    private boolean checkAuthority(Infoform infoForm) {
+        // 获取当前用户编号,名称
+        String curCode = "111";
+        String curName = "小希";
+        if (infoForm.getCIF_cPICode_insert().equals(curCode)) {
+            return true;
+        }
+        return Arrays.stream(infoForm.getCIFManager().split(","))
+                .anyMatch(element -> element.equals(curName));
+    }
+
+    /**
+     * 将存入的json字符串转化为标准的格式，例如：
+     *      [{id=0, content=选项一}, {id=3, content=2}, {id=4, content=3}]
+     *  转化为：
+     *      [{"id":0,"content":"选项一"},{"id":3,"content":"2"},{"id":4,"content":"3"}]
+     * @param input
+     * @return
+     */
+    private String convertToJson(String input) {
+        // 使用正则表达式匹配键值对
+        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+        Matcher matcher = pattern.matcher(input);
+
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("[");
+
+        // 遍历匹配结果，构建新的JSON字符串
+        while (matcher.find()) {
+            String match = matcher.group(1);
+            String[] keyValuePairs = match.split(",");
+
+            jsonBuilder.append("{");
+
+            for (String keyValuePair : keyValuePairs) {
+                String[] parts = keyValuePair.split("=");
+
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+
+                jsonBuilder.append("\"").append(key).append("\":\"").append(value).append("\",");
+            }
+
+            jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+            jsonBuilder.append("},");
+        }
+        jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+        jsonBuilder.append("]");
+        return jsonBuilder.toString();
     }
 }
