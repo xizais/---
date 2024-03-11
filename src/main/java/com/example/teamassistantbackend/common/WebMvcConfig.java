@@ -14,8 +14,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //        // 注册自定义的拦截器
         registry.addInterceptor(new AuthenticationInterceptor())
 //                .addPathPatterns("/**") // 拦截的路径
-////                .addPathPatterns("/clientContact/**") // 拦截的路径
-               .excludePathPatterns("/user/**") // 排除的路径
+                .addPathPatterns("/CollectInfo/**") // 拦截的路径
+//               .excludePathPatterns("/user/**") // 排除的路径
         ;
     }
 }

@@ -141,6 +141,9 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         for (JSONObject infoForm : infoList) {
             infoForm.put("authority",checkAuthority(infoForm));// 当前登入人是否是管理员或者创建者
         }
+        if (infoList.isEmpty()) {
+            infoList = new ArrayList<>();
+        }
         JSONObject result = new JSONObject();
         result.put("infoList",infoList);
         return result;

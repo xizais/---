@@ -8,6 +8,7 @@ import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.service.CollectInfoService;
 import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,7 +26,7 @@ public class CollectInfoController {
     /**
      * 保存信息收集表单（按stage状态判断是新增还是修改）
      */
-    @RequestMapping("/saveCollectDesign")
+    @PostMapping("/saveCollectDesign")
     @ResponseBody
     public BaseResponse<JSONObject> saveCollectDesign(@RequestBody JSONObject request){
         ArrayList<HashMap<String,Object>> containerData = (ArrayList<HashMap<String,Object>>)request.get("container");
@@ -67,7 +68,7 @@ public class CollectInfoController {
     /**
      * 返回列表数据
      */
-    @RequestMapping("/getCollectInfoList")
+    @PostMapping("/getCollectInfoList")
     @ResponseBody
     public BaseResponse<JSONObject> getCollectInfoList(@RequestBody JSONObject request){
         return ResultUtils.success(collectInfoService.getInfoList(request));
@@ -76,7 +77,7 @@ public class CollectInfoController {
     /**
      * 返回表单数据
      */
-    @RequestMapping("/getCollectInfo")
+    @PostMapping("/getCollectInfo")
     @ResponseBody
     public BaseResponse<JSONObject> getCollectInfo(@RequestBody JSONObject request){
         return ResultUtils.success(collectInfoService.getInfo(request.getString("iIFId")));
@@ -85,7 +86,7 @@ public class CollectInfoController {
     /**
      * 删除表单
      */
-    @RequestMapping("/deleteCollectInfo")
+    @PostMapping("/deleteCollectInfo")
     @ResponseBody
     public BaseResponse<String> deleteCollectInfo(@RequestBody JSONObject request){
         return ResultUtils.success(collectInfoService.deleteCollect(request));

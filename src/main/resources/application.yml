@@ -10,10 +10,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-  # session 失效时间（分钟）
-  session:
-    timeout: 86400
-    store-type: redis
+#  # session 失效时间（分钟）
+#  session:
+#    timeout: 86400
+##    store-type: redis
 #    store-type: none
   # redis 配置
   redis:
@@ -25,6 +25,8 @@ server:
   port: 8099
   servlet:
     context-path: /api
+    session:
+      timeout: 24h
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
@@ -38,3 +40,4 @@ mybatis-plus:
 knife4j:
   # 是否开启增强模式
   enable: true
+  production: false # 业务开发时，更改为false，则启用接口文档（地址：http://localhost:8099/api/doc.html#/home）
