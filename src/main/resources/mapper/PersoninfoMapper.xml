@@ -28,4 +28,8 @@
         cPIIdentity,cPI_cOICode,dPICreateTime,
         cPIPassword,bPIIsEnabled
     </sql>
+    <select id="getUserInfo" resultType="com.example.teamassistantbackend.entity.Personinfo">
+        select * from Personinfo where cPICode = #{userInfo.code}
+        and bPIIsEnabled = 1
+    </select>
 </mapper>

@@ -1,7 +1,10 @@
 package com.example.teamassistantbackend.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Personinfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author huang
@@ -9,6 +12,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2023-10-26 23:43:40
 */
 public interface PersoninfoService extends IService<Personinfo> {
-    //添加用户
-    boolean addPersonInfo(Personinfo personinfo);
+
+    JSONObject userLogin(String loginPhone, String loginPassword, HttpServletRequest request);//用户登入
+    void logout();//用户登出
+    JSONObject getCurUserInfo();//获取当前用户信息
 }

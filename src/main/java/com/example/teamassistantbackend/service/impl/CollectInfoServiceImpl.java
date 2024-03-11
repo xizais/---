@@ -11,6 +11,7 @@ import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.mapper.InfoformMapper;
 import com.example.teamassistantbackend.mapper.InfoformcreateMapper;
 import com.example.teamassistantbackend.service.CollectInfoService;
+import com.example.teamassistantbackend.service.PersoninfoService;
 import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class CollectInfoServiceImpl implements CollectInfoService {
+    @Resource
+    PersoninfoService personinfoService;
     @Resource
     InfoformMapper infoformMapper;// 表单配置
     @Resource
@@ -33,8 +36,9 @@ public class CollectInfoServiceImpl implements CollectInfoService {
 
         // 2. 数据处理
         // 2.2 创建配置表
-        String curHandlerCode = "111";// 当前处理人编号
-        String curHandler = "小希";// 当前处理人名称
+        JSONObject userInfo = personinfoService.getCurUserInfo();
+        String curHandlerCode = userInfo.getString("code");// 当前处理人编号
+        String curHandler = userInfo.getString("name");// 当前处理人名称
         Infoform infoform = new Infoform();
         if (!isAdd) {
             infoform = infoformMapper.selectById(iIFId);
@@ -130,8 +134,8 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     @Override
     public JSONObject getInfoList(JSONObject request) {
         // 获取当前用户编号
-        String cPICode = "111";
-        request.put("cPICode",cPICode);
+        JSONObject userInfo = personinfoService.getCurUserInfo();
+        request.put("cPICode",userInfo.getString("code"));
         // 查询用户表单配置信息数据：用户自身的、用户管理的（按时间排序）
         ArrayList<JSONObject> infoList = infoformMapper.getFromList(request);
         for (JSONObject infoForm : infoList) {
@@ -190,8 +194,10 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         if (infoform == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
+        JSONObject userInfo = personinfoService.getCurUserInfo();
+        String curHandlerCode = userInfo.getString("code");// 当前处理人编号
         infoform.setCIFUpdateTime(new Date());
-        infoform.setCIF_cPICode_update("111");// 后面更换成从对象中取出
+        infoform.setCIF_cPICode_update(curHandlerCode);// 后面更换成从对象中取出
         infoform.setDataState("1");
         infoformMapper.updateById(infoform);
         return "删除成功！";
@@ -201,11 +207,11 @@ public class CollectInfoServiceImpl implements CollectInfoService {
      * 检查表单数据
      */
     private void checkCollectData(ArrayList<HashMap<String, Object>> containers) {
-        JSONObject result = new JSONObject();
-        int i,j;
-        i=j=0;
+        int i =0;
+        int count = 0;
         for (HashMap<String, Object> container : containers) {
             i++;
+            int j = 0;
             ArrayList<HashMap<String,Object>> metas = (ArrayList<HashMap<String,Object>>)container.get("child");
             for (HashMap<String,Object> meta : metas) {
                 j++;
@@ -215,29 +221,35 @@ public class CollectInfoServiceImpl implements CollectInfoService {
                 if (StringUtils.isEmpty((String)meta.get("title"))) {
                     throw new BusinessException(ErrorCode.PARAMS_ERROR,"表单数据第"+i+"个容器的第"+j+"个元素的数据名称不允许为空！");
                 }
+                count++;
             }
+        }
+        if (count == 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"表单数据至少存在一个元素！");
         }
     }
 
     private boolean checkAuthority(Infoform infoForm) {
         // 获取当前用户编号,名称
-        String curCode = "111";
-        String curName = "小希";
-        if (infoForm.getCIF_cPICode_insert().equals(curCode)) {
+        JSONObject userInfo = personinfoService.getCurUserInfo();
+        String curHandlerCode = userInfo.getString("code");// 当前处理人编号
+        String curHandler = userInfo.getString("name");// 当前处理人名称
+        if (infoForm.getCIF_cPICode_insert().equals(curHandlerCode)) {
             return true;
         }
         return Arrays.stream(infoForm.getCIFManager().split(","))
-                .anyMatch(element -> element.equals(curName));
+                .anyMatch(element -> element.equals(curHandler));
     }
     private boolean checkAuthority(JSONObject infoForm) {
         // 获取当前用户编号,名称
-        String curCode = "111";
-        String curName = "小希";
-        if (infoForm.getString("cIF_cPICode_insert").equals(curCode)) {
+        JSONObject userInfo = personinfoService.getCurUserInfo();
+        String curHandlerCode = userInfo.getString("code");// 当前处理人编号
+        String curHandler = userInfo.getString("name");// 当前处理人名称
+        if (infoForm.getString("cIF_cPICode_insert").equals(curHandlerCode)) {
             return true;
         }
         return Arrays.stream(infoForm.getString("cIFManager").split(","))
-                .anyMatch(element -> element.equals(curName));
+                .anyMatch(element -> element.equals(curHandler));
     }
 
     /**

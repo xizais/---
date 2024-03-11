@@ -1,8 +1,10 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Personinfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author huang
@@ -13,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface PersoninfoMapper extends BaseMapper<Personinfo> {
 
+    Personinfo getUserInfo(@Param(value = "userInfo") JSONObject userInfo);// 获取用户信息
 }
 
 

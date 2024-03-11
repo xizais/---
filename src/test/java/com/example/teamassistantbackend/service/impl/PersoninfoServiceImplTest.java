@@ -1,7 +1,9 @@
 package com.example.teamassistantbackend.service.impl;
 import java.util.Date;
+import java.util.zip.CRC32;
 
 import com.example.teamassistantbackend.entity.Personinfo;
+import com.example.teamassistantbackend.mapper.PersoninfoMapper;
 import com.example.teamassistantbackend.service.PersoninfoService;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
@@ -16,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PersoninfoServiceImplTest {
     @Resource
     PersoninfoService personinfoService;
+    @Resource
+    PersoninfoMapper personinfoMapper;
     @Test
     void addPersonInfo() {
         Personinfo personinfo = new Personinfo();
@@ -30,12 +34,12 @@ public class PersoninfoServiceImplTest {
         personinfo.setCPIIdentity("学生");
         personinfo.setCPI_cOICode("1-1-1-2");
         personinfo.setDPICreateTime(new Date());
-        personinfo.setCPIPassword("123456");
+        CRC32 crc32 = new CRC32();
+        crc32.update("123456".getBytes());
+        String crc = "" + crc32.getValue();
+        personinfo.setCPIPassword(crc);
+        personinfoMapper.insert(personinfo);
 
-        if (personinfoService.addPersonInfo(personinfo))
-            System.out.println("插入成功！");
-        else
-            System.out.println("插入失败！");
     }
 
     @Resource
