@@ -1,6 +1,5 @@
 package com.example.teamassistantbackend.service.impl;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -16,8 +15,6 @@ import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +29,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId, String title) {
         JSONObject result = new JSONObject();
         // 1. 检查数据
-//        checkCollectData(containers);
+        checkCollectData(containers);
 
         // 2. 数据处理
         // 2.2 创建配置表
@@ -95,6 +92,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
                 metaForm.setIIFC_iIFId(iIFId);
                 metaForm.setId(meta.getInteger("id"));
                 metaForm.setContainerId(containerId);
+                metaForm.setTitle(meta.getString("title"));
                 metaForm.setWidth(meta.getString("width"));
                 metaForm.setHeight(meta.getString("height"));
                 metaForm.setShowBorder(meta.getString("showBorder"));
@@ -119,6 +117,8 @@ public class CollectInfoServiceImpl implements CollectInfoService {
                 metaForm.setIsNeed(meta.getString("isNeed"));
                 metaForm.setShowInnerBorder(meta.getString("showInnerBorder"));
                 metaForm.setType(meta.getString("type"));
+                metaForm.setMaxOption(meta.get("maxOption")==null?0:meta.getInteger("maxOption"));
+                metaForm.setMinOption(meta.get("minOption")==null?0:meta.getInteger("minOption"));
                 infoformcreateMapper.insert(metaForm);
             }
         }
@@ -134,6 +134,9 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         request.put("cPICode",cPICode);
         // 查询用户表单配置信息数据：用户自身的、用户管理的（按时间排序）
         ArrayList<JSONObject> infoList = infoformMapper.getFromList(request);
+        for (JSONObject infoForm : infoList) {
+            infoForm.put("authority",checkAuthority(infoForm));// 当前登入人是否是管理员或者创建者
+        }
         JSONObject result = new JSONObject();
         result.put("infoList",infoList);
         return result;
@@ -177,6 +180,45 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         return result;
     }
 
+    @Override
+    public String deleteCollect(JSONObject request) {
+        if (StringUtils.isEmpty(request.getString("iIFId"))) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 查询数据是否存在
+        Infoform infoform = infoformMapper.selectById(request.getString("iIFId"));
+        if (infoform == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        infoform.setCIFUpdateTime(new Date());
+        infoform.setCIF_cPICode_update("111");// 后面更换成从对象中取出
+        infoform.setDataState("1");
+        infoformMapper.updateById(infoform);
+        return "删除成功！";
+    }
+
+    /**
+     * 检查表单数据
+     */
+    private void checkCollectData(ArrayList<HashMap<String, Object>> containers) {
+        JSONObject result = new JSONObject();
+        int i,j;
+        i=j=0;
+        for (HashMap<String, Object> container : containers) {
+            i++;
+            ArrayList<HashMap<String,Object>> metas = (ArrayList<HashMap<String,Object>>)container.get("child");
+            for (HashMap<String,Object> meta : metas) {
+                j++;
+                if ("text".equals(meta.get("type"))) {
+                    continue;
+                }
+                if (StringUtils.isEmpty((String)meta.get("title"))) {
+                    throw new BusinessException(ErrorCode.PARAMS_ERROR,"表单数据第"+i+"个容器的第"+j+"个元素的数据名称不允许为空！");
+                }
+            }
+        }
+    }
+
     private boolean checkAuthority(Infoform infoForm) {
         // 获取当前用户编号,名称
         String curCode = "111";
@@ -185,6 +227,16 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             return true;
         }
         return Arrays.stream(infoForm.getCIFManager().split(","))
+                .anyMatch(element -> element.equals(curName));
+    }
+    private boolean checkAuthority(JSONObject infoForm) {
+        // 获取当前用户编号,名称
+        String curCode = "111";
+        String curName = "小希";
+        if (infoForm.getString("cIF_cPICode_insert").equals(curCode)) {
+            return true;
+        }
+        return Arrays.stream(infoForm.getString("cIFManager").split(","))
                 .anyMatch(element -> element.equals(curName));
     }
 

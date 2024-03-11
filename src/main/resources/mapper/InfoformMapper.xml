@@ -34,5 +34,6 @@
         from InfoForm
         where
             (cIF_cPICode_insert = #{data.cPICode} or FIND_IN_SET(#{data.cPICode}, cIFManager) > 0)
+            AND dataState = '0'
     </select>
 </mapper>

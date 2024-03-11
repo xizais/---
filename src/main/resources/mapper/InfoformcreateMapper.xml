@@ -8,6 +8,9 @@
             <id property="iIFCId" column="iIFCId" jdbcType="INTEGER"/>
             <result property="iIFC_iIFId" column="iIFC_iIFId" jdbcType="INTEGER"/>
             <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="maxOption" column="maxOption" jdbcType="INTEGER"/>
+            <result property="minOption" column="minOption" jdbcType="INTEGER"/>
             <result property="containerId" column="containerId" jdbcType="INTEGER"/>
             <result property="width" column="width" jdbcType="VARCHAR"/>
             <result property="height" column="height" jdbcType="VARCHAR"/>

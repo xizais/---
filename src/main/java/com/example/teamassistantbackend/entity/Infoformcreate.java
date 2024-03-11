@@ -38,6 +38,11 @@ public class Infoformcreate implements Serializable {
     private Integer containerId;
 
     /**
+     * 数据名称
+     */
+    private String title;
+
+    /**
      * 宽：百分比显示
      */
     private String width;
@@ -151,6 +156,16 @@ public class Infoformcreate implements Serializable {
      * 是否必填
      */
     private String isNeed;
+
+    /**
+     * 最大可选
+     */
+    private int maxOption;
+
+    /**
+     * 最小可选
+     */
+    private int minOption;
 
     /**
      * 类型（text、input、select、textarea、radio、checkbox、time）

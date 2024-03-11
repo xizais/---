@@ -81,4 +81,13 @@ public class CollectInfoController {
     public BaseResponse<JSONObject> getCollectInfo(@RequestBody JSONObject request){
         return ResultUtils.success(collectInfoService.getInfo(request.getString("iIFId")));
     }
+
+    /**
+     * 删除表单
+     */
+    @RequestMapping("/deleteCollectInfo")
+    @ResponseBody
+    public BaseResponse<String> deleteCollectInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.deleteCollect(request));
+    }
 }
