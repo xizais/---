@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author huang
  */
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/User")
 public class LoginController {
     @Resource
     PersoninfoService personinfoService;

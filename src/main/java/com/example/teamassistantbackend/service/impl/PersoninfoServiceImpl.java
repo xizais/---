@@ -8,6 +8,8 @@ import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.service.PersoninfoService;
 import com.example.teamassistantbackend.mapper.PersoninfoMapper;
 import com.example.teamassistantbackend.utils.StringUtils;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -62,9 +64,20 @@ public class PersoninfoServiceImpl extends ServiceImpl<PersoninfoMapper, Personi
         userInfo.put("name",personinfo.getCPIName());
         // 6. 保存用户信息
         request.getSession().setAttribute(USER_LOGIN_STATE, userInfo);
+
+        userInfo.put("token",generateToken(userInfo));
         return userInfo;
     }
 
+    private String generateToken(JSONObject user) {
+        // 生成 Token
+        String token = Jwts.builder()
+                .setSubject(user.getString("name"))
+                .claim("code", user.getString("code")) // 添加自定义的用户信息到 Token 中
+                .signWith(SignatureAlgorithm.HS512, "yourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKeyyourSecretKey")
+                .compact();
+        return token;
+    }
     @Override
     public void logout() {
         JSONObject userInfo = getCurUserInfo();
