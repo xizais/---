@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.PubconfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Pubconfig">
+            <id property="iPCId" column="iPCId" jdbcType="INTEGER"/>
+            <result property="iTypeId" column="iTypeId" jdbcType="INTEGER"/>
+            <result property="cType" column="cType" jdbcType="VARCHAR"/>
+            <result property="dPubStartTime" column="dPubStartTime" jdbcType="TIMESTAMP"/>
+            <result property="dPubEndTime" column="dPubEndTime" jdbcType="TIMESTAMP"/>
+            <result property="cIsApproval" column="cIsApproval" jdbcType="VARCHAR"/>
+            <result property="iMaxRecordCount" column="iMaxRecordCount" jdbcType="INTEGER"/>
+            <result property="cIsOrgManger" column="cIsOrgManger" jdbcType="VARCHAR"/>
+            <result property="cPuber" column="cPuber" jdbcType="VARCHAR"/>
+            <result property="cPubToPerson" column="cPubToPerson" jdbcType="VARCHAR"/>
+            <result property="cPubToOrg" column="cPubToOrg" jdbcType="VARCHAR"/>
+            <result property="cPubToFlag" column="cPubToFlag" jdbcType="VARCHAR"/>
+            <result property="dCreateTime" column="dCreateTime" jdbcType="TIMESTAMP"/>
+            <result property="dUpdateTime" column="dUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="cCreator" column="cCreator" jdbcType="VARCHAR"/>
+            <result property="cUpdater" column="cUpdater" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iPCId,iTypeId,cType,
+        dPubStartTime,dPubEndTime,cIsApproval,
+        iMaxRecordCount,cIsOrgManger,cPuber,
+        cPubToPerson,cPubToOrg,cPubToFlag,
+        dCreateTime,dUpdateTime,cCreator,
+        cUpdater,dataState
+    </sql>
+</mapper>
