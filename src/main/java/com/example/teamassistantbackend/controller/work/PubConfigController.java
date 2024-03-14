@@ -3,6 +3,7 @@ package com.example.teamassistantbackend.controller.work;
 import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.common.BaseResponse;
 import com.example.teamassistantbackend.common.ErrorCode;
+import com.example.teamassistantbackend.common.ResultUtils;
 import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.service.PubconfigService;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,6 @@ public class PubConfigController {
     @PostMapping("/savePubConfig")
     @ResponseBody
     public BaseResponse<JSONObject> saveCollectDesign(@RequestBody JSONObject request){
-        return pubconfigService.savePubConfig(request);
+        return ResultUtils.success(pubconfigService.savePubConfig(request));
     }
 }

@@ -32,4 +32,10 @@
         dCreateTime,dUpdateTime,cCreator,
         cUpdater,dataState
     </sql>
+    <select id="selectPubConfig" resultType="com.alibaba.fastjson.JSONObject">
+        select * from pubconfig
+        where dataState = 0
+            and cType = #{data.cType}
+            and iTypeId = #{data.iTypeId}
+    </select>
 </mapper>

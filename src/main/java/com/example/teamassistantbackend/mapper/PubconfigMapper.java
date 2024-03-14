@@ -1,7 +1,9 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Pubconfig;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author huang
@@ -11,6 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface PubconfigMapper extends BaseMapper<Pubconfig> {
 
+    JSONObject selectPubConfig(@Param(value = "data") JSONObject request);// 查询发布配置信息，根据关联表ID、类型
 }
 
 
