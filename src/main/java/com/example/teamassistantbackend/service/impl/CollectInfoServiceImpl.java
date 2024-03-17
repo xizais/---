@@ -1,19 +1,26 @@
 package com.example.teamassistantbackend.service.impl;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.teamassistantbackend.common.ErrorCode;
+import com.example.teamassistantbackend.domain.Worktask;
 import com.example.teamassistantbackend.entity.Infoform;
 import com.example.teamassistantbackend.entity.Infoformcreate;
+import com.example.teamassistantbackend.entity.Pubconfig;
 import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.mapper.InfoformMapper;
 import com.example.teamassistantbackend.mapper.InfoformcreateMapper;
-import com.example.teamassistantbackend.service.CollectInfoService;
-import com.example.teamassistantbackend.service.PersoninfoService;
+import com.example.teamassistantbackend.mapper.WorktaskMapper;
+import com.example.teamassistantbackend.service.*;
 import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.regex.Matcher;
@@ -27,6 +34,14 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     InfoformMapper infoformMapper;// 表单配置
     @Resource
     InfoformcreateMapper infoformcreateMapper;// 表单创建
+    @Resource
+    PubconfigService pubconfigService;
+    @Resource
+    OrganizationinfoService organizationinfoService;
+    @Resource
+    WorktaskService worktaskService;
+    @Resource
+    WorktaskMapper worktaskMapper;
 
     @Override
     public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId, String title) {
@@ -204,6 +219,154 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         infoform.setDataState("1");
         infoformMapper.updateById(infoform);
         return "删除成功！";
+    }
+
+    @Override
+    @Transactional
+    public JSONObject pubCollectInfo(JSONObject request) {
+        request.put("cType","CollectInfo");
+        Pubconfig pubconfig = pubconfigService.checkPubInfo(request);
+        // 更新信息收集表单的信息（例如发布者，数据状态等）
+        QueryWrapper<Infoform> infoformQueryWrapper = new QueryWrapper<>();
+        infoformQueryWrapper.eq("iIFId",request.getString("iTypeId"));
+        infoformQueryWrapper.eq("dataState","0");
+        Infoform infoform = infoformMapper.selectOne(infoformQueryWrapper);
+        if (infoform == null) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"表单配置信息不存在，请联系管理员处理！");
+        }
+        if (infoform.getCIFState().equals("发布")) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"该表单已发布！");
+        }
+        if (infoform.getCIFState().equals("停止")) {
+            // 删除之前的待办
+            QueryWrapper<Worktask> worktaskQueryWrapper = new QueryWrapper<>();
+            worktaskQueryWrapper.in("type", "CollectInfo", "CollectInfoApproval");
+            List<Worktask> worktaskList = worktaskMapper.selectList(worktaskQueryWrapper);
+            for (Worktask wt : worktaskList) {
+                wt.setDatastate("1");
+            }
+            worktaskService.updateBatchById(worktaskList);
+        }
+        infoform.setCIFPuber(pubconfig.getCPuber());// 发布者
+        infoform.setCIFState("发布");// 表单状态
+        infoform.setCIFPubTime(pubconfig.getDPubStartTime());// 发布时间
+        infoform.setCIFPubStaff(pubconfig.getCPubToPerson());// 发布人员
+        infoform.setCIFPubOrg(pubconfig.getCPubToOrg());// 发布组织
+        infoform.setCIFPubFlag(pubconfig.getCPubToFlag());// 发布标签
+        // 获取当前处理人信息
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        infoform.setCIF_cPICode_update(curUserInfo.getString("code"));// 更新修改人员
+        infoform.setCIFUpdateTime(new Date());// 更新修改时间
+        // 根据表单信息创建表单语句表
+        String tableName = createTableOfFromConfig(request.getString("iTypeId"),infoform.getCIFTitle());
+        infoform.setCIFTableName(tableName);
+        infoformMapper.updateById(infoform);
+        // 添加原始数据和待办
+        // 获取发布人员信息
+        List<JSONObject> personCodeList = organizationinfoService.getPersonCodeList(pubconfig.getCPubToPersonCode(), pubconfig.getCPubToOrgCode(), pubconfig.getCPubToFlagCode());
+        // 添加数据
+        infoformcreateMapper.batchInsert(tableName,personCodeList);
+        // 添加待办
+        List<Worktask> worktaskList = new ArrayList<>();
+        for (JSONObject personInfo : personCodeList) {
+            Worktask worktask = new Worktask();
+            worktask.setType("CollectInfo");
+            worktask.setTypeid(request.getInteger("iTypeId"));
+            worktask.setCode(personInfo.getString("code"));
+            worktask.setUpdatetime(new Date());
+            worktaskList.add(worktask);
+        }
+        worktaskService.saveBatch(worktaskList);
+        JSONObject result = new JSONObject();
+        result.put("message","发布成功！");
+        return result;
+    }
+
+    /**
+     * 创建表单数据表
+     * @param iIFId 表单配置ID
+     */
+    private String createTableOfFromConfig(String iIFId,String title) {
+        // 查询表单元素
+        QueryWrapper<Infoformcreate> infoformcreateQueryWrapper = new QueryWrapper<>();
+        infoformcreateQueryWrapper.eq("iIFC_iIFId",iIFId);
+        infoformcreateQueryWrapper.ne("type","container");// 不是容器
+        infoformcreateQueryWrapper.ne("type","text");// 不是文本
+        List<Infoformcreate> infoformcreates = infoformcreateMapper.selectList(infoformcreateQueryWrapper);
+
+        // 生成表名
+        String tableName = generateTableName(iIFId);
+        // 删除表
+        infoformcreateMapper.deleteFromDataTable(tableName);
+        // 创建表
+        String createSql = "CREATE TABLE `"+tableName+"`  (" +
+            "`id` INT NOT NULL AUTO_INCREMENT COMMENT '自增主键'," +
+            "`code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '人员编号'," +
+            "`name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '人员名称'," +
+            "`dCreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',"+
+            "`dUpdateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',"+
+            "`cState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '状态（0：未完成；1：已完成；2：待审批）'," +
+            "`dataState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '数据状态（0：活动；1：删除）'," ;
+        for (Infoformcreate infoform: infoformcreates) {
+            String type = infoform.getType();
+            switch (type) {
+                case "input" : {
+                    createSql += "`input-"+infoform.getId()+"` varchar("+(infoform.getMaxLength()+4)+") ";
+                    if (!StringUtils.isEmpty(infoform.getDefaultText())) {
+                        createSql += "DEFAULT '"+infoform.getDefaultText()+"' ";
+                    }
+                    createSql += " COMMENT '"+infoform.getTitle()+"',";
+                    break;
+                }
+                case "select" : {
+                    createSql += "`select-"+infoform.getId()+"` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '"+infoform.getTitle()+"',";
+                    break;
+                }
+                case "textarea" : {
+                    createSql += "`textarea-"+infoform.getId()+"` varchar("+(infoform.getMaxLength()+4)+") ";
+                    if (!StringUtils.isEmpty(infoform.getDefaultText())) {
+                        createSql += "DEFAULT '"+infoform.getDefaultText()+"' ";
+                    }
+                    createSql += " COMMENT '"+infoform.getTitle()+"',";
+                    break;
+                }
+                case "radio" : {
+                    createSql += "`radio-"+infoform.getId()+"` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '"+infoform.getTitle()+"',";
+                    break;
+                }
+                case "checkbox" : {
+                    createSql += "`checkbox-"+infoform.getId()+"` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '"+infoform.getTitle()+"',";
+                    break;
+                }
+                case "time" : {
+                    createSql += "`time-"+infoform.getId()+"` datetime ";
+                    if (infoform.getDefaultTime() != null) {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        String formattedDate = dateFormat.format(infoform.getDefaultTime());
+                        createSql += " DEFAULT '"+formattedDate+"' ";
+                    }
+                    createSql += " COMMENT '"+infoform.getTitle()+"',";
+                    break;
+                }
+            }
+        }
+        createSql += "PRIMARY KEY (`id`) USING BTREE" +
+                ") ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '信息收集数据表-"+title+"' ROW_FORMAT = DYNAMIC;";
+        infoformcreateMapper.createFromDataTable(createSql);
+        return tableName;
+    }
+
+    /**
+     * 生成表名
+     */
+    private String generateTableName(String tableName) {
+        tableName = "ci_"+tableName+"_";
+        // 获取年月日
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String formattedDate = currentDate.format(formatter);
+        tableName += formattedDate;
+        return tableName;
     }
 
     /**

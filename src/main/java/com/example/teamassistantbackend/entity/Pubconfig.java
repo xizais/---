@@ -46,10 +46,10 @@ public class Pubconfig implements Serializable {
      */
     private String cIsApproval;
 
-    /**
-     * 用户最大填写记录数量
-     */
-    private Integer iMaxRecordCount;
+//    /**
+//     * 用户最大填写记录数量
+//     */
+//    private Integer iMaxRecordCount;
 
     /**
      * 是否启用组织管理
@@ -72,9 +72,24 @@ public class Pubconfig implements Serializable {
     private String cPubToOrg;
 
     /**
-     * 发布标识（标签ID）
+     * 发布标识
      */
     private String cPubToFlag;
+
+    /**
+     * 发布人员code
+     */
+    private String cPubToPersonCode;
+
+    /**
+     * 发布组织code
+     */
+    private String cPubToOrgCode;
+
+    /**
+     * 发布标识（标签ID）
+     */
+    private String cPubToFlagCode;
 
     /**
      * 创建时间

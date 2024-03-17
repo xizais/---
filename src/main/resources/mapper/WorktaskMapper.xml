@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.WorktaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.domain.Worktask">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+            <result property="typeid" column="typeId" jdbcType="INTEGER"/>
+            <result property="code" column="code" jdbcType="VARCHAR"/>
+            <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="datastate" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,type,typeId,
+        code,updateTime,state,
+        dataState
+    </sql>
+</mapper>

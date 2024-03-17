@@ -15,6 +15,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new AuthenticationInterceptor())
 //                .addPathPatterns("/**") // 拦截的路径
                 .addPathPatterns("/CollectInfo/**") // 拦截的路径
+                .addPathPatterns("/PubConfig/**") // 拦截的路径
 //               .excludePathPatterns("/user/**") // 排除的路径
         ;
     }

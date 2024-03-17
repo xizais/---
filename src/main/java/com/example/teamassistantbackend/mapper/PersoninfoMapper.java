@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
 * @author huang
 * @description 针对表【personinfo(人员信息表)】的数据库操作Mapper
@@ -16,6 +18,8 @@ import org.apache.ibatis.annotations.Param;
 public interface PersoninfoMapper extends BaseMapper<Personinfo> {
 
     Personinfo getUserInfo(@Param(value = "userInfo") JSONObject userInfo);// 获取用户信息
+
+    List<JSONObject> getUserCodeAndName(String personCodeList);
 }
 
 

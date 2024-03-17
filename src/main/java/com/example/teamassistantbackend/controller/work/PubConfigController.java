@@ -29,4 +29,22 @@ public class PubConfigController {
     public BaseResponse<JSONObject> saveCollectDesign(@RequestBody JSONObject request){
         return ResultUtils.success(pubconfigService.savePubConfig(request));
     }
+
+    @PostMapping("/getPubConfigInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> getPubConfigInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(pubconfigService.getPubConfig(request));
+    }
+
+    /**
+     * 获得发布对象信息，按type进行获取。
+     *  type：   person 人员
+     *          org 组织
+     *          flag 标签
+     */
+    @PostMapping("/getPubObjectInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> getPubObjectInfo(){
+        return ResultUtils.success(pubconfigService.getPubObjectList());
+    }
 }

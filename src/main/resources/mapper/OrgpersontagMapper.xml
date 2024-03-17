@@ -21,4 +21,7 @@
         dOPTCreationTime,cOPTIncludedOrgId,cOPTIncludedPersonCode,
         bOPTIsEnabled,bOPTIsSystemShared,bOPTIsOrgShared
     </sql>
+    <select id="getTagInfoById" resultType="com.example.teamassistantbackend.entity.Orgpersontag">
+        select * from OrgPersonTag where bOPTIsEnabled = 1 and cOPTTagId in (${flagCodes})
+    </select>
 </mapper>

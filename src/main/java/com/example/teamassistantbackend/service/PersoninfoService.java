@@ -16,4 +16,5 @@ public interface PersoninfoService extends IService<Personinfo> {
     JSONObject userLogin(String loginPhone, String loginPassword, HttpServletRequest request);//用户登入
     void logout();//用户登出
     JSONObject getCurUserInfo();//获取当前用户信息
+
 }

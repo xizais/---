@@ -15,4 +15,8 @@ public interface PubconfigService extends IService<Pubconfig> {
     JSONObject savePubConfig(JSONObject request);// 保存发版配置信息
 
     JSONObject getPubConfig(JSONObject request);// 获取发布配置信息
+
+    JSONObject getPubObjectList();
+
+    Pubconfig checkPubInfo(JSONObject request);// 查询发布配置信息
 }

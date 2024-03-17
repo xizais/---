@@ -32,4 +32,7 @@
         select * from Personinfo where cPICode = #{userInfo.code}
         and bPIIsEnabled = 1
     </select>
+    <select id="getUserCodeAndName" resultType="com.alibaba.fastjson.JSONObject">
+        select cPICode code, cPIName name from PersonInfo where bPIIsEnabled = 1 and cPICode in (${personCodeList})
+    </select>
 </mapper>

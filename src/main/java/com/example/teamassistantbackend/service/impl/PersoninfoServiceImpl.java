@@ -1,9 +1,11 @@
 package com.example.teamassistantbackend.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.teamassistantbackend.common.ErrorCode;
 import com.example.teamassistantbackend.entity.Personinfo;
+import com.example.teamassistantbackend.entity.Pubconfig;
 import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.service.PersoninfoService;
 import com.example.teamassistantbackend.mapper.PersoninfoMapper;

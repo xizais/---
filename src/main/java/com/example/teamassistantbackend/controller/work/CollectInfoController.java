@@ -91,4 +91,13 @@ public class CollectInfoController {
     public BaseResponse<String> deleteCollectInfo(@RequestBody JSONObject request){
         return ResultUtils.success(collectInfoService.deleteCollect(request));
     }
+
+    /**
+     * 发布
+     */
+    @PostMapping("/pubCollectInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> pubCollectInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.pubCollectInfo(request));
+    }
 }

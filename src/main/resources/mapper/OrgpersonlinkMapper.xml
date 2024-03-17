@@ -17,4 +17,7 @@
         cOPL_cOICode,cOPL_cPICode,dOPLCreationTime,
         cOPLCreatedBy,cOPLPermissionSet,iOPLPersonStatus
     </sql>
+    <select id="getPersonCodeByOrgCode" resultType="java.lang.String">
+        select distinct cOPL_cPICode from OrgPersonLink where cOPL_cOICode in (${orgCodes}) and iOPLPersonStatus = 1;
+    </select>
 </mapper>

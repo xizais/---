@@ -58,4 +58,17 @@
     <select id="getMetaId" resultType="java.lang.Integer">
         select max(id) from infoformcreate where iIFC_iIFId = #{iIFId}
     </select>
+    <update id="deleteFromDataTable">
+        DROP TABLE IF EXISTS `${tableName}`;
+    </update>
+    <update id="createFromDataTable">
+        ${createSql}
+    </update>
+    <update id="batchInsert">
+        INSERT INTO ${tableName} (name, code)
+        VALUES
+        <foreach collection="personCodeList" item="item" separator=",">
+            (#{item.name}, #{item.code})
+        </foreach>
+    </update>
 </mapper>

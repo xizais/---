@@ -13,4 +13,6 @@ public interface CollectInfoService {
     public JSONObject getInfo(String iIFId);// 根据表单配置ID获取表单信息
 
     public String deleteCollect(JSONObject request);// 删除（更新状态为删除）表单
+
+    public JSONObject pubCollectInfo(JSONObject request);
 }

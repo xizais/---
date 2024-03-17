@@ -4,6 +4,8 @@ import com.example.teamassistantbackend.entity.Orgpersonlink;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
 * @author huang
 * @description 针对表【orgpersonlink(组织-人员关联表)】的数据库操作Mapper
@@ -13,6 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface OrgpersonlinkMapper extends BaseMapper<Orgpersonlink> {
 
+    List<String> getPersonCodeByOrgCode(String orgCodes);
 }
 
 

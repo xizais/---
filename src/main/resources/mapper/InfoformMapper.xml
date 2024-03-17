@@ -58,10 +58,10 @@
                 <if test="data.optionValue == '我的管理'">
                     AND (cIF_cPICode_insert = #{data.cPICode} or FIND_IN_SET(#{data.cPICode}, cIFManager) > 0)
                 </if>
-                <if test="data.optionValue == '未完成填写'">
+                <if test="data.optionValue == '未完成'">
                     AND cIFState = '草稿' -- 未完成填写
                 </if>
-                <if test="data.optionValue == '已完成填写'">
+                <if test="data.optionValue == '已完成'">
                     AND cIFState = '草稿' -- 已经完成填写
                 </if>
             </if>

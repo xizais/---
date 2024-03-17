@@ -1,12 +1,12 @@
 package com.example.teamassistantbackend.mapper;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.teamassistantbackend.entity.Infoformcreate;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
 * @author huang
@@ -21,6 +21,12 @@ public interface InfoformcreateMapper extends BaseMapper<Infoformcreate> {
     ArrayList<JSONObject> getChildInfo(@Param(value = "iIFId") String iIFId,@Param(value = "iIFCId") String iIFCId);
 
     int getMetaId(String iIFId);
+
+    void createFromDataTable(String createSql);
+
+    void deleteFromDataTable(String tableName);
+
+    void batchInsert(@Param(value = "tableName") String tableName, @Param(value = "personCodeList") List<JSONObject> personCodeList);
 }
 
 

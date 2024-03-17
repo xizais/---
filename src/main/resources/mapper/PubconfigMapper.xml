@@ -11,11 +11,14 @@
             <result property="dPubStartTime" column="dPubStartTime" jdbcType="TIMESTAMP"/>
             <result property="dPubEndTime" column="dPubEndTime" jdbcType="TIMESTAMP"/>
             <result property="cIsApproval" column="cIsApproval" jdbcType="VARCHAR"/>
-            <result property="iMaxRecordCount" column="iMaxRecordCount" jdbcType="INTEGER"/>
+<!--            <result property="iMaxRecordCount" column="iMaxRecordCount" jdbcType="INTEGER"/>-->
             <result property="cIsOrgManger" column="cIsOrgManger" jdbcType="VARCHAR"/>
             <result property="cPuber" column="cPuber" jdbcType="VARCHAR"/>
             <result property="cPubToPerson" column="cPubToPerson" jdbcType="VARCHAR"/>
             <result property="cPubToOrg" column="cPubToOrg" jdbcType="VARCHAR"/>
+            <result property="cPubToPersonCode" column="cPubToPersonCode" jdbcType="VARCHAR"/>
+            <result property="cPubToOrgCode" column="cPubToOrgCode" jdbcType="VARCHAR"/>
+            <result property="cPubToFlagCode" column="cPubToFlagCode" jdbcType="VARCHAR"/>
             <result property="cPubToFlag" column="cPubToFlag" jdbcType="VARCHAR"/>
             <result property="dCreateTime" column="dCreateTime" jdbcType="TIMESTAMP"/>
             <result property="dUpdateTime" column="dUpdateTime" jdbcType="TIMESTAMP"/>
@@ -27,15 +30,30 @@
     <sql id="Base_Column_List">
         iPCId,iTypeId,cType,
         dPubStartTime,dPubEndTime,cIsApproval,
-        iMaxRecordCount,cIsOrgManger,cPuber,
+--         iMaxRecordCount,cIsOrgManger,cPuber,
+        cIsOrgManger,cPuber,
         cPubToPerson,cPubToOrg,cPubToFlag,
         dCreateTime,dUpdateTime,cCreator,
-        cUpdater,dataState
+        cUpdater,dataState,cPubToPersonCode,
+        cPubToOrgCode,cPubToFlagCode
+
     </sql>
     <select id="selectPubConfig" resultType="com.alibaba.fastjson.JSONObject">
-        select * from pubconfig
-        where dataState = 0
-            and cType = #{data.cType}
+        select pf.*,info.cIFState infoState from pubconfig pf
+        <if test="data.type == 'CollectInfo'">
+            LEFT JOIN (select iIFId,cIFState from InfoForm where iIFId = #{data.iTypeId}) info ON pf.iTypeId = info.iIFId
+        </if>
+        <if test="data.type != '????'">
+
+        </if>
+        where dataState = '0'
+            and cType = #{data.type}
             and iTypeId = #{data.iTypeId}
+    </select>
+    <select id="getPersonsList" resultType="com.alibaba.fastjson.JSONObject">
+        select cPICode personId,cPIName personName,'暂定' as personBelong from PersonInfo where bPIIsEnabled = 1
+    </select>
+    <select id="checkDataIsPub" resultType="java.lang.Boolean">
+        select count(*) from ${name} where dataState = '0' and cIFState = '发布' ${condition}
     </select>
 </mapper>
