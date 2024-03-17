@@ -3,19 +3,45 @@
 
  Source Server         : localhost_3306
  Source Server Type    : MySQL
- Source Server Version : 80034
+ Source Server Version : 80036 (8.0.36)
  Source Host           : localhost:3306
  Source Schema         : team_assistant
 
  Target Server Type    : MySQL
- Target Server Version : 80034
+ Target Server Version : 80036 (8.0.36)
  File Encoding         : 65001
 
- Date: 13/03/2024 17:40:28
+ Date: 17/03/2024 23:54:02
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for ci_16_20240317
+-- ----------------------------
+DROP TABLE IF EXISTS `ci_16_20240317`;
+CREATE TABLE `ci_16_20240317`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '人员编号',
+  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '人员名称',
+  `dCreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `dUpdateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `cState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '状态（0：未完成；1：已完成；2：待审批）',
+  `dataState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '数据状态（0：活动；1：删除）',
+  `input-3` varchar(104) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '123' COMMENT '输入框啦',
+  `input-4` varchar(104) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '输入框2',
+  `textarea-5` varchar(1004) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文本框',
+  `radio-6` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '单选框',
+  `checkbox-7` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '多选框',
+  `time-8` datetime NULL DEFAULT '2024-03-17 00:00:00' COMMENT '时间选择器',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '信息收集数据表-测试表数据生成' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of ci_16_20240317
+-- ----------------------------
+INSERT INTO `ci_16_20240317` VALUES (1, '111111', '小七', '2024-03-17 23:16:45', '2024-03-17 23:16:45', '0', '0', '123', NULL, NULL, NULL, NULL, '2024-03-17 00:00:00');
 
 -- ----------------------------
 -- Table structure for fileinfo
@@ -59,22 +85,24 @@ CREATE TABLE `infoform`  (
   `cIFPubFlag` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '数据发布对象标签',
   `dataState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '数据状态（0：活动；1：删除）',
   PRIMARY KEY (`iIFId`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '信息收集表单配置表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '信息收集表单配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of infoform
 -- ----------------------------
-INSERT INTO `infoform` VALUES (4, '201549221', '测试01', '小希', NULL, '2024-03-07 23:34:08', '201549221', '2024-03-13 14:37:48', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
-INSERT INTO `infoform` VALUES (5, '201549221', '测试02', '小希', NULL, '2024-03-09 16:02:08', '201549221', '2024-03-13 14:37:48', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
-INSERT INTO `infoform` VALUES (6, '201549221', '测试03', '小希', NULL, '2024-03-09 16:18:26', '201549221', '2024-03-13 14:37:48', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
-INSERT INTO `infoform` VALUES (7, '111', '测试04', '小希', NULL, '2024-03-10 13:57:27', '111', '2024-03-10 14:27:29', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
-INSERT INTO `infoform` VALUES (8, '111', '测试04', '小希', NULL, '2024-03-10 13:57:32', '111', '2024-03-10 14:26:47', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
-INSERT INTO `infoform` VALUES (9, '111', '测试04', '小希', NULL, '2024-03-10 13:59:30', '111', '2024-03-10 18:57:32', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
-INSERT INTO `infoform` VALUES (10, '111', '5', '小希', NULL, '2024-03-10 18:49:59', '111', '2024-03-10 18:53:38', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
-INSERT INTO `infoform` VALUES (11, '111', '6', '小希', NULL, '2024-03-10 18:50:16', '111', '2024-03-10 18:53:17', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
-INSERT INTO `infoform` VALUES (12, '111', '123', '小希', NULL, '2024-03-10 18:57:20', '111', '2024-03-10 18:57:40', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
-INSERT INTO `infoform` VALUES (13, '201549221', '测试04', '小希', NULL, '2024-03-10 18:58:17', '201549221', '2024-03-13 14:37:48', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
-INSERT INTO `infoform` VALUES (14, '111', '2131', '小希', NULL, '2024-03-10 18:58:29', '111', '2024-03-10 18:58:37', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (4, '201549221', '测试01', '小希', NULL, '2024-03-07 23:34:08', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
+INSERT INTO `infoform` VALUES (5, '201549221', '测试02', '小希', NULL, '2024-03-09 16:02:08', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
+INSERT INTO `infoform` VALUES (6, '201549221', '测试03', '小希', NULL, '2024-03-09 16:18:26', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
+INSERT INTO `infoform` VALUES (7, '201549221', '测试04', '小希', NULL, '2024-03-10 13:57:27', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (8, '201549221', '测试04', '小希', NULL, '2024-03-10 13:57:32', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (9, '201549221', '测试04', '小希', NULL, '2024-03-10 13:59:30', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (10, '201549221', '5', '小希', NULL, '2024-03-10 18:49:59', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (11, '201549221', '6', '小希', NULL, '2024-03-10 18:50:16', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (12, '201549221', '123', '小希', NULL, '2024-03-10 18:57:20', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (13, '201549221', '测试04', '小希', NULL, '2024-03-10 18:58:17', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '0');
+INSERT INTO `infoform` VALUES (14, '201549221', '2131', '小希', NULL, '2024-03-10 18:58:29', '201549221', '2024-03-11 22:46:41', NULL, '草稿', '小希', NULL, NULL, NULL, '1');
+INSERT INTO `infoform` VALUES (15, '201549221', '测试05', '希仔', NULL, '2024-03-12 22:25:24', '希仔', '2024-03-12 22:25:24', NULL, '草稿', '希仔', NULL, NULL, NULL, '0');
+INSERT INTO `infoform` VALUES (16, '201549221', '测试表数据生成', '黄晓斌', 'ci_16_20240317', '2024-03-17 15:32:54', '201549221', '2024-03-17 23:16:45', '2024-03-18 00:00:00', '发布', '希仔', '小七', '', '', '0');
 
 -- ----------------------------
 -- Table structure for infoformcreate
@@ -113,7 +141,7 @@ CREATE TABLE `infoformcreate`  (
   `maxOption` int NULL DEFAULT NULL COMMENT '最大可选',
   `showInnerBorder` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '是否显示内边框',
   PRIMARY KEY (`iIFCId`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 140 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '信息收集表单创建信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 157 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '信息收集表单创建信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of infoformcreate
@@ -158,6 +186,20 @@ INSERT INTO `infoformcreate` VALUES (136, 13, 17, 132, '', '200', '30', 'false',
 INSERT INTO `infoformcreate` VALUES (137, 13, 18, 132, '', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'false', 'time', 0, 0, NULL);
 INSERT INTO `infoformcreate` VALUES (138, 13, 19, 132, '', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'false', 'time', 0, 0, NULL);
 INSERT INTO `infoformcreate` VALUES (139, 14, 0, 0, NULL, '60', '500', 'true', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'container', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (140, 15, 0, 0, NULL, '60', '500', 'true', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'container', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (141, 15, 1, 140, '', '700', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', 'none', '20', '400', 'Kaiti', '测试05', 'center', NULL, NULL, NULL, NULL, NULL, NULL, 'text', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (142, 15, 2, 140, '', '100', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', 'none', '14', '400', 'Microsoft YaHei', '姓名：', 'right', NULL, NULL, NULL, NULL, NULL, NULL, 'text', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (143, 15, 3, 140, '姓名', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, '14', '400', 'Microsoft YaHei', '', 'left', 'black', '请输入内容', '10', NULL, NULL, 'false', 'input', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (144, 15, 4, 140, '', '100', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', 'none', '14', '400', 'Microsoft YaHei', '学号：', 'right', NULL, NULL, NULL, NULL, NULL, NULL, 'text', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (145, 15, 5, 140, '学号', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, '14', '400', 'Microsoft YaHei', '', 'left', 'black', '请输入内容', '10', NULL, NULL, 'false', 'input', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (149, 16, 0, 0, NULL, '60', '500', 'true', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'container', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (150, 16, 2, 149, '', '100', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', 'none', '14', '400', 'Microsoft YaHei', '这是一个文本', 'left', NULL, NULL, NULL, NULL, NULL, 'false', 'text', 0, 0, 'false');
+INSERT INTO `infoformcreate` VALUES (151, 16, 3, 149, '输入框啦', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, '14', '400', 'Microsoft YaHei', '123', 'left', 'black', '请输入内容', '10', NULL, NULL, 'false', 'input', 0, 0, 'false');
+INSERT INTO `infoformcreate` VALUES (152, 16, 4, 149, '输入框2', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, '14', '400', 'Microsoft YaHei', '', 'left', 'black', '请输入内容', '10', NULL, NULL, 'false', 'input', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (153, 16, 5, 149, '文本框', '300', '100', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, '14', '400', 'Microsoft YaHei', '', 'left', 'black', '请输入内容', '100', NULL, NULL, 'false', 'textarea', 0, 0, NULL);
+INSERT INTO `infoformcreate` VALUES (154, 16, 6, 149, '单选框', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, '选项一', NULL, NULL, NULL, NULL, '[{id=0, content=选项一}]', NULL, 'false', 'radio', 0, 0, 'true');
+INSERT INTO `infoformcreate` VALUES (155, 16, 7, 149, '多选框', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, '[]', NULL, NULL, NULL, NULL, '[{id=0, content=选项一}]', NULL, 'false', 'checkbox', 1, 1, 'true');
+INSERT INTO `infoformcreate` VALUES (156, 16, 8, 149, '时间选择器', '200', '30', 'false', '1', 'true', '1', '10', '10', '10', '10', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-03-17 00:00:00', 'false', 'time', 0, 0, NULL);
 
 -- ----------------------------
 -- Table structure for organizationinfo
@@ -187,6 +229,7 @@ CREATE TABLE `organizationinfo`  (
 -- ----------------------------
 -- Records of organizationinfo
 -- ----------------------------
+INSERT INTO `organizationinfo` VALUES ('1-1-1-1', '2015492', '软件工程2班', NULL, '通用', b'0', 0, '2024-03-17 21:18:24', '201549221', '201549221', b'0', 'uuid()', 'uuid()', 'uuid()', 'uuid()', 'uuid()', b'0');
 
 -- ----------------------------
 -- Table structure for orgpersonlink
@@ -205,6 +248,7 @@ CREATE TABLE `orgpersonlink`  (
 -- ----------------------------
 -- Records of orgpersonlink
 -- ----------------------------
+INSERT INTO `orgpersonlink` VALUES ('2015492', '201549221', '2024-03-17 21:19:07', '201549221', NULL, 1);
 
 -- ----------------------------
 -- Table structure for orgpersontag
@@ -226,6 +270,7 @@ CREATE TABLE `orgpersontag`  (
 -- ----------------------------
 -- Records of orgpersontag
 -- ----------------------------
+INSERT INTO `orgpersontag` VALUES ('1', '测试01', '201549221', '2024-03-17 21:21:28', '2015492', '111111', b'1', b'0', b'0');
 
 -- ----------------------------
 -- Table structure for personinfo
@@ -252,7 +297,8 @@ CREATE TABLE `personinfo`  (
 -- ----------------------------
 -- Records of personinfo
 -- ----------------------------
-INSERT INTO `personinfo` VALUES ('201549221', '希仔', '男', NULL, '', '13829377437', '', '', '', '学生', '1-1-1-2', '2024-03-12 13:17:50', '158520161', b'1');
+INSERT INTO `personinfo` VALUES ('111111', '小七', '男', NULL, '', '13829377437', '', '', '', '学生', '1-1-1-2', '2024-03-11 20:31:19', '158520161', b'1');
+INSERT INTO `personinfo` VALUES ('201549221', '希仔', '男', NULL, '', '13829377437', '', '', '', '学生', '1-1-1-2', '2024-03-11 20:31:19', '158520161', b'1');
 
 -- ----------------------------
 -- Table structure for pubconfig
@@ -265,23 +311,28 @@ CREATE TABLE `pubconfig`  (
   `dPubStartTime` datetime NULL DEFAULT NULL COMMENT '发布开始时间',
   `dPubEndTime` datetime NULL DEFAULT NULL COMMENT '发布停止时间',
   `cIsApproval` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '是' COMMENT '是否进行审核',
-  `iMaxRecordCount` int NULL DEFAULT 1 COMMENT '用户最大填写记录数量',
   `cIsOrgManger` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '是' COMMENT '是否启用组织管理',
   `cPuber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布者',
   `cPubToPerson` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布人员',
   `cPubToOrg` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布组织',
-  `cPubToFlag` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布标识（标签ID）',
+  `cPubToFlag` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布标识',
+  `cPubToPersonCode` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布人员code',
+  `cPubToOrgCode` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布组织code',
+  `cPubToFlagCode` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发布标识（标签ID）',
   `dCreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `dUpdateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   `cCreator` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '创建者',
   `cUpdater` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '修改者',
   `dataState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '数据状态（0：活动；1：删除）',
   PRIMARY KEY (`iPCId`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '发布配置表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '发布配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of pubconfig
 -- ----------------------------
+INSERT INTO `pubconfig` VALUES (2, 4, 'CollectInfo', '2024-03-16 00:00:00', '2024-03-16 00:00:00', 'true', 'false', '123', '小七', '小七, 希仔', '希仔', '', '111111, 201549221', '201549221', '2024-03-16 19:52:27', '2024-03-17 13:21:05', '希仔', NULL, '0');
+INSERT INTO `pubconfig` VALUES (8, 5, 'CollectInfo', '2024-03-16 00:00:00', '2024-03-16 00:00:00', 'false', 'true', '123', '小七', '', '', '[]', '[]', '[]', '2024-03-16 20:11:37', '2024-03-17 13:26:56', '希仔', NULL, '0');
+INSERT INTO `pubconfig` VALUES (9, 16, 'CollectInfo', '2024-03-18 00:00:00', '2024-03-24 00:00:00', 'false', 'true', '黄晓斌', '小七,  希仔', '', '', '111111,  201549221', '', '', '2024-03-17 15:33:25', '2024-03-17 23:25:31', '希仔', NULL, '0');
 
 -- ----------------------------
 -- Table structure for ruleinformation
@@ -298,5 +349,30 @@ CREATE TABLE `ruleinformation`  (
 -- ----------------------------
 -- Records of ruleinformation
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for worktask
+-- ----------------------------
+DROP TABLE IF EXISTS `worktask`;
+CREATE TABLE `worktask`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '工作类型',
+  `typeId` int NULL DEFAULT NULL COMMENT '工作ID',
+  `code` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '人员编码',
+  `updateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '数据更新时间',
+  `state` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '草稿' COMMENT '状态',
+  `dataState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '数据状态（0：活动；1：删除）',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '工作待办表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of worktask
+-- ----------------------------
+INSERT INTO `worktask` VALUES (1, 'CollectInfo', 16, '111111', '2024-03-17 22:39:20', '草稿', '1');
+INSERT INTO `worktask` VALUES (2, 'CollectInfo', 16, '201549221', '2024-03-17 22:39:20', '草稿', '1');
+INSERT INTO `worktask` VALUES (3, 'CollectInfo', 16, '111111', '2024-03-17 22:51:20', '草稿', '1');
+INSERT INTO `worktask` VALUES (4, 'CollectInfo', 16, '201549221', '2024-03-17 22:51:20', '草稿', '1');
+INSERT INTO `worktask` VALUES (5, 'CollectInfo', 16, '111111', '2024-03-17 23:15:07', '草稿', '0');
+INSERT INTO `worktask` VALUES (6, 'CollectInfo', 16, '111111', '2024-03-17 23:16:46', '草稿', '0');
 
 SET FOREIGN_KEY_CHECKS = 1;
