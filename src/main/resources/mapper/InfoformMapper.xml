@@ -27,8 +27,6 @@
         cIFPubOrg,cIFPubFlag,dataState
     </sql>
     <select id="getFromList" resultType="com.alibaba.fastjson.JSONObject">
--- 这里再加上从任务表中取到的该用户需要填写或已经填写的数据
-
         select *,
                DATE_FORMAT(cIFCreateTime, '%Y-%m-%d') as standerCreateTime,
                DATE_FORMAT(cIFUpdateTime, '%Y-%m-%d') as standerUpdateTime,
@@ -36,6 +34,8 @@
         from InfoForm
         where
             dataState = '0'
+            AND ((cIFState = '发布' AND cIF_cPICode_update = #{data.cPICode})
+                or ((cIF_cPICode_insert = #{data.cPICode} or FIND_IN_SET(#{data.cPICode}, cIFManager) > 0)))
         <if test="data.searchInput != null and data.searchInput != ''">
             AND (cIFTitle like CONCAT('%', #{data.searchInput}, '%')
                 OR cIFPuber like CONCAT('%', #{data.searchInput}, '%')
@@ -44,6 +44,47 @@
         <if test="data.showOther != null and data.showOther == true">
             <if test="data.startDate != null and data.startDate != ''">
               AND cIFCreateTime &gt;= #{data.startDate} -- 大于等于
+            </if>
+            <if test="data.endDate != null and data.endDate != ''">
+                AND cIFCreateTime &lt;= #{data.endDate} -- 小于等于
+            </if>
+            <if test="data.optionValue != null and data.optionValue != ''">
+                <if test="data.optionValue == '我的草稿'">
+                    AND cIFState = '草稿'
+                </if>
+                <if test="data.optionValue == '我的发布'">
+                    AND cIFState = '发布' AND cIF_cPICode_update = #{data.cPICode}
+                </if>
+                <if test="data.optionValue == '我的管理'">
+                    AND (cIF_cPICode_insert = #{data.cPICode} or FIND_IN_SET(#{data.cPICode}, cIFManager) > 0)
+                </if>
+                <if test="data.optionValue == '未完成'">
+                    AND cIFState = '草稿' -- 未完成填写
+                </if>
+                <if test="data.optionValue == '已完成'">
+                    AND cIFState = '草稿' -- 已经完成填写
+                </if>
+            </if>
+        </if>
+        <if test="data.currentPage != null and data.currentPage != '' and data.pageSize != null and data.pageSize != ''">
+            limit #{data.pageSize} OFFSET #{data.offset}
+        </if>
+    </select>
+    <select id="getFromListCount" resultType="java.lang.Integer">
+        select count(*) as amount
+        from InfoForm
+        where
+        dataState = '0'
+            AND ((cIFState = '发布' AND cIF_cPICode_update = #{data.cPICode})
+            or ((cIF_cPICode_insert = #{data.cPICode} or FIND_IN_SET(#{data.cPICode}, cIFManager) > 0)))
+        <if test="data.searchInput != null and data.searchInput != ''">
+            AND (cIFTitle like CONCAT('%', #{data.searchInput}, '%')
+            OR cIFPuber like CONCAT('%', #{data.searchInput}, '%')
+            )
+        </if>
+        <if test="data.showOther != null and data.showOther == true">
+            <if test="data.startDate != null and data.startDate != ''">
+                AND cIFCreateTime &gt;= #{data.startDate} -- 大于等于
             </if>
             <if test="data.endDate != null and data.endDate != ''">
                 AND cIFCreateTime &lt;= #{data.endDate} -- 小于等于

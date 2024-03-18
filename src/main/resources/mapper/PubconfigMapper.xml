@@ -45,6 +45,10 @@
         </if>
         <if test="data.type != '????'">
 
+
+
+
+
         </if>
         where dataState = '0'
             and cType = #{data.type}

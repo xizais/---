@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public interface InfoformMapper extends BaseMapper<Infoform> {
 
     ArrayList<JSONObject> getFromList(@Param(value = "data") JSONObject data);// 获取用户的表单配置
+    int getFromListCount(@Param(value = "data") JSONObject data);// 获取数据数量
 }
 
 

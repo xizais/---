@@ -153,6 +153,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         request.put("cPICode",userInfo.getString("code"));
         // 查询用户表单配置信息数据：用户自身的、用户管理的（按时间排序）
         ArrayList<JSONObject> infoList = infoformMapper.getFromList(request);
+        int amount = infoformMapper.getFromListCount(request);
         for (JSONObject infoForm : infoList) {
             infoForm.put("authority",checkAuthority(infoForm));// 当前登入人是否是管理员或者创建者
         }
@@ -161,6 +162,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         }
         JSONObject result = new JSONObject();
         result.put("infoList",infoList);
+        result.put("amount",amount);
         return result;
     }
 
@@ -391,7 +393,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             }
         }
         if (count == 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"表单数据至少存在一个元素！");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"表单数据至少存在一个非文本元素！");
         }
     }
 
