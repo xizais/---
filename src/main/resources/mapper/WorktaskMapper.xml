@@ -4,19 +4,183 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.teamassistantbackend.mapper.WorktaskMapper">
 
-    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.domain.Worktask">
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Worktask">
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="type" column="type" jdbcType="VARCHAR"/>
             <result property="typeid" column="typeId" jdbcType="INTEGER"/>
             <result property="code" column="code" jdbcType="VARCHAR"/>
             <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
             <result property="datastate" column="dataState" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,type,typeId,
         code,updateTime,state,
-        dataState
+        content,dataState
     </sql>
+    <select id="getWorkInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT * FROM (
+            SELECT
+                id,
+                typeId,
+                DATE_FORMAT(updateTime, '%Y-%m-%d') AS updateTime,
+                state,
+                content,
+                cIFTitle AS title,
+                cIFPuber AS puber,
+                CASE type
+                    WHEN 'CollectInfo' THEN '信息收集'
+                    WHEN 'CollectInfoApproval' THEN '信息收集审批'
+                    WHEN 'Task' THEN '任务'
+                    WHEN 'TaskApproval' THEN '任务审批'
+                    WHEN 'Notify' THEN '通知'
+                END AS type
+            FROM
+                worktask wt
+                LEFT JOIN InfoForm info ON wt.typeId = info.iIFId
+            WHERE
+                wt.dataState = '0'
+                AND code = #{code}
+                AND (type = 'CollectInfo' OR type = 'CollectInfoApproval')
+            ) AS subquery1
+
+        UNION
+
+        SELECT * FROM (
+            SELECT
+                id,
+                typeId,
+                DATE_FORMAT(updateTime, '%Y-%m-%d') AS updateTime,
+                state,
+                content,
+                cTMTitle AS title,
+                cTMPubName AS puber,
+                CASE type
+                    WHEN 'Task' THEN '任务'
+                    WHEN 'TaskApproval' THEN '任务审批'
+                END AS type
+            FROM
+                worktask wt
+                LEFT JOIN taskManager tm ON wt.typeId = tm.iTMId
+            WHERE
+                wt.dataState = '0'
+                AND code = #{code}
+                AND (type = 'Task' OR type = 'TaskApproval')
+        ) AS subquery2
+
+         union
+
+        SELECT
+            *
+        FROM
+        (
+            SELECT
+                id,
+                typeId,
+                DATE_FORMAT( updateTime, '%Y-%m-%d' ) AS updateTime,
+                state,
+                content,
+                cNMTitle AS title,
+                cNMPubName AS puber,
+                CASE
+                    type
+                    WHEN 'Notify' THEN
+                    '通知'
+                END AS type
+            FROM
+                worktask wt
+                LEFT JOIN noticeManager nm ON wt.typeId = nm.iNMId
+            WHERE
+                wt.dataState = '0'
+                AND CODE = #{code}
+                AND ( type = 'Notify' OR type = 'Notify' )
+        ) AS subquery3
+        ORDER BY id DESC
+        <if test="data.selectPage.currentPage != null and data.selectPage.currentPage != '' and data.selectPage.pageSize != null and data.selectPage.pageSize != ''">
+            limit #{data.selectPage.pageSize} OFFSET #{data.selectPage.offset}
+        </if>
+    </select>
+    <select id="getWorkInfoListMount" resultType="java.lang.Integer">
+        select count(*) from (
+         SELECT * FROM (
+               SELECT
+                   id,
+                   typeId,
+                   DATE_FORMAT(updateTime, '%Y-%m-%d') AS updateTime,
+                   state,
+                   content,
+                   cIFTitle AS title,
+                   cIFPuber AS puber,
+                   CASE type
+                       WHEN 'CollectInfo' THEN '信息收集'
+                       WHEN 'CollectInfoApproval' THEN '信息收集审批'
+                       WHEN 'Task' THEN '任务'
+                       WHEN 'TaskApproval' THEN '任务审批'
+                       WHEN 'Notify' THEN '通知'
+                       END AS type
+               FROM
+                   worktask wt
+                       LEFT JOIN InfoForm info ON wt.typeId = info.iIFId
+               WHERE
+                   wt.dataState = '0'
+                 AND  code = #{code}
+                 AND (type = 'CollectInfo' OR type = 'CollectInfoApproval')
+           ) AS subquery1
+
+         UNION
+
+         SELECT * FROM (
+               SELECT
+                   id,
+                   typeId,
+                   DATE_FORMAT(updateTime, '%Y-%m-%d') AS updateTime,
+                   state,
+                   content,
+                   cTMTitle AS title,
+                   cTMPubName AS puber,
+                   CASE type
+                       WHEN 'Task' THEN '任务'
+                       WHEN 'TaskApproval' THEN '任务审批'
+                       END AS type
+               FROM
+                   worktask wt
+                       LEFT JOIN taskManager tm ON wt.typeId = tm.iTMId
+               WHERE
+                   wt.dataState = '0'
+                 AND  code = #{code}
+                 AND (type = 'Task' OR type = 'TaskApproval')
+           ) AS subquery2
+
+         union
+
+         SELECT
+             *
+         FROM
+             (
+                 SELECT
+                     id,
+                     typeId,
+                     DATE_FORMAT( updateTime, '%Y-%m-%d' ) AS updateTime,
+                     state,
+                     content,
+                     cNMTitle AS title,
+                     cNMPubName AS puber,
+                     CASE
+                         type
+                         WHEN 'Notify' THEN
+                             '通知'
+                         END AS type
+                 FROM
+                     worktask wt
+                         LEFT JOIN noticeManager nm ON wt.typeId = nm.iNMId
+                 WHERE
+                     wt.dataState = '0'
+                   AND CODE = #{code}
+                   AND ( type = 'Notify' OR type = 'Notify' )
+             ) AS subquery3
+         ORDER BY id DESC
+     ) amount
+    </select>
 </mapper>

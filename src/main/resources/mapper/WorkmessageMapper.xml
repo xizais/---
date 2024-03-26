@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.WorkmessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Workmessage">
+            <id property="iWMId" column="iWMId" jdbcType="INTEGER"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+            <result property="typeId" column="typeId" jdbcType="INTEGER"/>
+            <result property="personCode" column="personCode" jdbcType="VARCHAR"/>
+            <result property="personName" column="personName" jdbcType="VARCHAR"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="handler" column="handler" jdbcType="VARCHAR"/>
+            <result property="handleTime" column="handleTime" jdbcType="TIMESTAMP"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iWMId,type,typeId,
+        personCode,personName,content,
+        handler,handleTime,dataState
+    </sql>
+</mapper>

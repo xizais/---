@@ -1,8 +1,10 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Orgpersonlink;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,6 +18,8 @@ import java.util.List;
 public interface OrgpersonlinkMapper extends BaseMapper<Orgpersonlink> {
 
     List<String> getPersonCodeByOrgCode(String orgCodes);
+
+    List<JSONObject> selectPersonByPersonCodeAndOrgCodes(@Param("personCode") String personCode,@Param("orgs") String orgs);
 }
 
 

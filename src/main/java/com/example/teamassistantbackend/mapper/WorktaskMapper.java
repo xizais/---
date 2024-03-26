@@ -1,7 +1,11 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.teamassistantbackend.domain.Worktask;
+import com.example.teamassistantbackend.entity.Worktask;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author 希仔
@@ -11,6 +15,9 @@ import com.example.teamassistantbackend.domain.Worktask;
 */
 public interface WorktaskMapper extends BaseMapper<Worktask> {
 
+    List<JSONObject> getWorkInfoList(@Param("code") String code,@Param("data") JSONObject request);
+
+    int getWorkInfoListMount(@Param("code") String code,@Param("data") JSONObject request);
 }
 
 

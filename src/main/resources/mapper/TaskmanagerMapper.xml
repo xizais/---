@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.TaskmanagerMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Taskmanager">
+            <id property="iTMId" column="iTMId" jdbcType="INTEGER"/>
+            <result property="cTMManagerCodes" column="cTMManagerCodes" jdbcType="VARCHAR"/>
+            <result property="cTMPubName" column="cTMPubName" jdbcType="VARCHAR"/>
+            <result property="cTMTitle" column="cTMTitle" jdbcType="VARCHAR"/>
+            <result property="cTMRequest" column="cTMRequest" jdbcType="VARCHAR"/>
+            <result property="cTMContent" column="cTMContent" jdbcType="VARCHAR"/>
+            <result property="cTMState" column="cTMState" jdbcType="VARCHAR"/>
+            <result property="dTMCreateTime" column="dTMCreateTime" jdbcType="TIMESTAMP"/>
+            <result property="dTMUpdateTime" column="dTMUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="cTMCreaterCode" column="cTMCreaterCode" jdbcType="VARCHAR"/>
+            <result property="cTMUpdaterCode" column="cTMUpdaterCode" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iTMId,cTMManagerCodes,cTMPubName,
+        cTMTitle,cTMRequest,cTMContent,
+        cTMState,dTMCreateTime,dTMUpdateTime,
+        cTMCreaterCode,cTMUpdaterCode,dataState
+    </sql>
+</mapper>

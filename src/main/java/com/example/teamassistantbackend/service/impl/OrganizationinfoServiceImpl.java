@@ -3,8 +3,8 @@ package com.example.teamassistantbackend.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.teamassistantbackend.entity.Organizationinfo;
-import com.example.teamassistantbackend.entity.Orgpersonlink;
 import com.example.teamassistantbackend.entity.Orgpersontag;
+import com.example.teamassistantbackend.entity.Pubconfig;
 import com.example.teamassistantbackend.mapper.OrgpersonlinkMapper;
 import com.example.teamassistantbackend.mapper.OrgpersontagMapper;
 import com.example.teamassistantbackend.mapper.PersoninfoMapper;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +59,25 @@ public class OrganizationinfoServiceImpl extends ServiceImpl<OrganizationinfoMap
                             .map(code -> "'" + code + "'")
                             .collect(Collectors.joining(",")));
         return dataList;
+    }
+
+    @Override
+    public List<String> getOrgCodesByPubConfig(Pubconfig pubconfig) {
+        List<String> result = Arrays.asList(pubconfig.getCPubToOrgCode().split(","));
+        List<Orgpersontag> orgPersonTags = orgpersontagMapper.getTagInfoById(pubconfig.getCPubToFlagCode());
+        for (Orgpersontag data : orgPersonTags) {
+            result.addAll(Arrays.asList(data.getCOPTIncludedOrgId().split(",")));
+        }
+        return result.stream().distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public String selectPersonExitOrgs(String personCode, String orgs) {
+        List<JSONObject> datas = orgpersonlinkMapper.selectPersonByPersonCodeAndOrgCodes(personCode,orgs);
+        if (datas.isEmpty()) {
+            return null;
+        }
+        return datas.get(0).getString("cOPL_cOICode");
     }
 
     private List<String> getPersonCodesByFlag(String flagCodes) {

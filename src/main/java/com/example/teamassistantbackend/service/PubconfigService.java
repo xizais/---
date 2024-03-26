@@ -19,4 +19,10 @@ public interface PubconfigService extends IService<Pubconfig> {
     JSONObject getPubObjectList();
 
     Pubconfig checkPubInfo(JSONObject request);// 查询发布配置信息
+
+    void checkPubStopTime(String type, Integer iIFId);// 检查发布停止时间
+
+    Pubconfig getPubConfigByData(String type, Integer typeId);
+
+    void deletePubConfig(String iTypeId, String cType);
 }

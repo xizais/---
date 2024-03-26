@@ -43,12 +43,11 @@
         <if test="data.type == 'CollectInfo'">
             LEFT JOIN (select iIFId,cIFState from InfoForm where iIFId = #{data.iTypeId}) info ON pf.iTypeId = info.iIFId
         </if>
-        <if test="data.type != '????'">
-
-
-
-
-
+        <if test="data.type == 'Notify'">
+            LEFT JOIN (select iNMId,cNMState cIFState from noticemanager where iNMId = #{data.iTypeId}) info ON pf.iTypeId = info.iNMId
+        </if>
+        <if test="data.type == 'Task'">
+            LEFT JOIN (select iTMId,cTMState cIFState from taskmanager where iTMId = #{data.iTypeId}) info ON pf.iTypeId = info.iTMId
         </if>
         where dataState = '0'
             and cType = #{data.type}
@@ -58,6 +57,6 @@
         select cPICode personId,cPIName personName,'暂定' as personBelong from PersonInfo where bPIIsEnabled = 1
     </select>
     <select id="checkDataIsPub" resultType="java.lang.Boolean">
-        select count(*) from ${name} where dataState = '0' and cIFState = '发布' ${condition}
+        select count(*) from ${name} where dataState = '0' ${condition}
     </select>
 </mapper>

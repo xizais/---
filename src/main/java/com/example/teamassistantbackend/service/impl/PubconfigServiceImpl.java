@@ -1,12 +1,19 @@
 package com.example.teamassistantbackend.service.impl;
 import java.util.Date;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.teamassistantbackend.common.BaseResponse;
 import com.example.teamassistantbackend.common.ErrorCode;
+import com.example.teamassistantbackend.entity.Infoform;
+import com.example.teamassistantbackend.entity.Noticemanager;
+import com.example.teamassistantbackend.entity.Taskmanager;
 import com.example.teamassistantbackend.exception.BusinessException;
+import com.example.teamassistantbackend.mapper.InfoformMapper;
+import com.example.teamassistantbackend.mapper.NoticemanagerMapper;
+import com.example.teamassistantbackend.mapper.TaskmanagerMapper;
 import com.example.teamassistantbackend.service.PersoninfoService;
 import com.example.teamassistantbackend.service.PubconfigService;
 import com.example.teamassistantbackend.entity.Pubconfig;
@@ -29,6 +36,13 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
     PersoninfoService personinfoService;
     @Resource
     PubconfigMapper pubconfigMapper;
+    @Resource
+    InfoformMapper infoformMapper;
+    @Resource
+    TaskmanagerMapper taskmanagerMapper;
+    @Resource
+    NoticemanagerMapper noticemanagerMapper;
+
     @Override
     public JSONObject savePubConfig(JSONObject request) {
         // 检查数据
@@ -88,6 +102,33 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         } else {
             pubconfigMapper.updateById(pubconfig);
         }
+
+        // 更新对应表的修改时间
+        switch (request.getString("cType")) {
+            case "CollectInfo": {
+                Infoform infoform = infoformMapper.selectById(request.getInteger("iTypeId"));
+                infoform.setCIFUpdateTime(new Date());
+                infoform.setCIF_cPICode_update(curUserInfo.getString("code"));
+                infoformMapper.updateById(infoform);
+                break;
+            }
+            case "Task": {
+                Taskmanager taskmanager = taskmanagerMapper.selectById(request.getInteger("iTypeId"));
+                taskmanager.setCTMUpdaterCode(curUserInfo.getString("code"));
+                taskmanager.setDTMUpdateTime(new Date());
+                taskmanagerMapper.updateById(taskmanager);
+                break;
+            }
+            case "Notify": {
+                Noticemanager noticemanager = noticemanagerMapper.selectById(request.getInteger("iTypeId"));
+                noticemanager.setCNMUpdaterCode(curUserInfo.getString("code"));
+                noticemanager.setDNMUpdateTime(new Date());
+                noticemanagerMapper.updateById(noticemanager);
+                break;
+            }
+
+        }
+
         JSONObject result = new JSONObject();
         result.put("message","保存成功！");
         return result;
@@ -143,6 +184,8 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         pubconfigQueryWrapper.eq("cType", request.getString("cType"));
         pubconfigQueryWrapper.eq("dataState", "0");
         Pubconfig pubconfig = pubconfigMapper.selectOne(pubconfigQueryWrapper);
+
+        boolean isNotify = "Notify".equals(request.getString("cType"));
         if (pubconfig == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "不存在发布配置信息！");
         }
@@ -150,7 +193,7 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         if (pubconfig.getDPubStartTime() == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "配置发布开始时间不存在，请进行完善！");
         }
-        if (pubconfig.getDPubEndTime() == null) {
+        if (!isNotify && pubconfig.getDPubEndTime() == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "配置发布停止时间不存在，请进行完善！");
         }
         if (StringUtils.isEmpty(pubconfig.getCIsApproval())){
@@ -162,12 +205,12 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         if (StringUtils.isEmpty(pubconfig.getCPuber())){
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "配置发布者不存在，请进行完善！");
         }
-        // 检查发布时间应该大于当前时间
-        if (pubconfig.getDPubStartTime().before(new Date())) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR,"发布时间应大于当前时间");
-        }
+//        // 检查发布时间应该大于当前时间 -- 》 去掉：默认在当前时间之前的就直接发布
+//        if (pubconfig.getDPubStartTime().before(new Date())) {
+//            throw new BusinessException(ErrorCode.OPERATION_ERROR,"发布时间应大于当前时间");
+//        }
         // 检查发布时间是否小于停止时间
-        if (pubconfig.getDPubEndTime().before(pubconfig.getDPubStartTime())) {
+        if (!isNotify && pubconfig.getDPubEndTime().before(pubconfig.getDPubStartTime())) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "发布时间不允许大于停止时间！");
         }
         boolean exitPubObject = false;
@@ -186,29 +229,80 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         return pubconfig;
     }
 
+    @Override
+    public void checkPubStopTime(String type, Integer iIFId) {
+        QueryWrapper<Pubconfig> pubconfigQueryWrapper = new QueryWrapper<>();
+        pubconfigQueryWrapper.eq("cType",type);
+        pubconfigQueryWrapper.eq("iTypeId",iIFId);
+        Pubconfig pubconfig = pubconfigMapper.selectOne(pubconfigQueryWrapper);
+        if (pubconfig.getDPubEndTime().before(new Date())) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"当前时间已超过发布停止时间，不允许重新发布！");
+        }
+    }
+
+    @Override
+    public Pubconfig getPubConfigByData(String type, Integer typeId) {
+        QueryWrapper<Pubconfig> pubconfigQueryWrapper = new QueryWrapper<>();
+        pubconfigQueryWrapper.eq("cType",type);
+        pubconfigQueryWrapper.eq("iTypeId",typeId);
+        List<Pubconfig> pubconfigs = pubconfigMapper.selectList(pubconfigQueryWrapper);
+        if (pubconfigs.isEmpty()) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"发布配置不存在！");
+        }
+        return pubconfigs.get(0);
+    }
+
+    @Override
+    public void deletePubConfig(String iTypeId, String cType) {
+        QueryWrapper<Pubconfig> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("cType",cType);
+        queryWrapper.eq("iTypeId",iTypeId);
+        queryWrapper.eq("dataState","0");
+        Pubconfig pubconfig = pubconfigMapper.selectOne(queryWrapper);
+        if (pubconfig!=null) {
+            pubconfig.setDataState("1");
+            pubconfigMapper.updateById(pubconfig);
+        }
+    }
+
     private void checkPubConfig(JSONObject request) {
         if (request.get("iTypeId") == null || request.get("cType") == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        if (request.get("dPubStartTime") == null || request.get("dPubEndTime") == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择发布起始时间！");
+        boolean isNotify = "Notify".equals(request.getString("cType"));
+        if (request.get("dPubStartTime") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择发布开始时间！");
         }
-        // 发布时间小于结束时间
-        if (request.getTimestamp("dPubEndTime").before(request.getTimestamp("dPubStartTime"))) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应小于停止时间！");
+        if (!isNotify && request.get("dPubEndTime") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择发布停止时间！");
         }
+//        // 发布时间小于结束时间 --》 去掉：原因默认立即发布
+//        if (request.getTimestamp("dPubEndTime").before(request.getTimestamp("dPubStartTime"))) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应小于停止时间！");
+//        }
         // 发布时间大于当前时间
-        if (request.getTimestamp("dPubStartTime").before(new Date())) {
+        if (!isNotify && request.getTimestamp("dPubStartTime").before(new Date())) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应大于当前时间！");
         }
         String tableName = "";
         String condition = "";
         // 如果已经发布，则不允许进行保存
         switch (request.getString("cType")) {
-            case "CollectInfo":
+            case "CollectInfo":{
                 tableName = "infoform";
-                condition = " and iIFId = "+request.getString("iTypeId");
+                condition = " and iIFId = "+request.getString("iTypeId")+" and cIFState = '发布'";
                 break;
+            }
+            case "Notify":{
+                tableName = "noticemanager";
+                condition = " and iNMId = "+request.getString("iTypeId")+" and cNMState = '发布'";
+                break;
+            }
+            case "Task":{
+                tableName = "taskmanager";
+                condition = " and iTMId = "+request.getString("iTypeId")+" and cTMState = '发布'";
+                break;
+            }
         }
         boolean result = pubconfigMapper.checkDataIsPub(condition,tableName);
         if (result) {

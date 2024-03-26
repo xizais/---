@@ -88,6 +88,18 @@ public class PersoninfoServiceImpl extends ServiceImpl<PersoninfoMapper, Personi
         return (JSONObject) httpServletRequest.getSession().getAttribute(USER_LOGIN_STATE);
     }
 
+    @Override
+    public String getPersonName(String code) {
+        QueryWrapper<Personinfo> personinfoQueryWrapper = new QueryWrapper<>();
+        personinfoQueryWrapper.eq("cPICode",code);
+        personinfoQueryWrapper.eq("bPIIsEnabled",1);
+        List<Personinfo> personinfos = personinfoMapper.selectList(personinfoQueryWrapper);
+        if (personinfos.isEmpty()) {
+            return null;
+        }
+        return personinfos.get(0).getCPIName();
+    }
+
 }
 
 

@@ -1,4 +1,4 @@
-package com.example.teamassistantbackend.domain;
+package com.example.teamassistantbackend.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -44,6 +44,11 @@ public class Worktask implements Serializable {
      * 状态
      */
     private String state;
+
+    /**
+     * 内容描述
+     */
+    private String content;
 
     /**
      * 数据状态（0：活动；1：删除）
@@ -135,6 +140,20 @@ public class Worktask implements Serializable {
      */
     public void setState(String state) {
         this.state = state;
+    }
+
+    /**
+     * 内容描述
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * 内容描述
+     */
+    public void setContent(String content) {
+        this.content = content;
     }
 
     /**

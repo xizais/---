@@ -9,13 +9,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.teamassistantbackend.common.ErrorCode;
-import com.example.teamassistantbackend.domain.Worktask;
-import com.example.teamassistantbackend.entity.Infoform;
-import com.example.teamassistantbackend.entity.Infoformcreate;
-import com.example.teamassistantbackend.entity.Pubconfig;
+import com.example.teamassistantbackend.entity.*;
 import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.mapper.InfoformMapper;
 import com.example.teamassistantbackend.mapper.InfoformcreateMapper;
+import com.example.teamassistantbackend.mapper.WorkmessageMapper;
 import com.example.teamassistantbackend.mapper.WorktaskMapper;
 import com.example.teamassistantbackend.service.*;
 import com.example.teamassistantbackend.utils.StringUtils;
@@ -42,6 +40,8 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     WorktaskService worktaskService;
     @Resource
     WorktaskMapper worktaskMapper;
+    @Resource
+    WorkmessageMapper workmessageMapper;
 
     @Override
     public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId, String title) {
@@ -284,6 +284,424 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         return result;
     }
 
+    @Override
+    public JSONObject deleteDataById(JSONObject request) {
+        if (request==null || request.get("id") == null || request.get("iIFId") == null)
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        String tableName = getDataTableName(request.getInteger("iIFId"));
+        String deleteSql = "update "+tableName+" set dataState = 1 where id = "+request.getInteger("id");
+        infoformcreateMapper.doExcuSql(deleteSql);
+        JSONObject result = new JSONObject();
+        result.put("message","删除成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject getFromData(JSONObject request) {
+        if (request == null || request.get("iIFId") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<JSONObject> fromData = infoformcreateMapper.getFromDataListByTableName(getDataTableName(request.getInteger("iIFId")));
+        JSONObject result = new JSONObject();
+        result.put("fromData",fromData);
+        return result;
+    }
+
+    @Override
+    public JSONObject clickNotify(JSONObject request) {
+        if (request == null || request.get("type") == null || request.get("iIFId") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean isNotifyAll = "all".equals(request.getString("type"));
+        int iIFId = request.getInteger("iIFId");
+        String tableName = getDataTableName(iIFId);
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        if (isNotifyAll) {
+            List<JSONObject> fromDataListByTableName = infoformcreateMapper.getFromDataListByTableName(tableName);
+            if (fromDataListByTableName.isEmpty()) {
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+            }
+            for (JSONObject fromData : fromDataListByTableName) {
+                if ("未完成".equals(fromData.getString("state"))) {
+                    notifyMessage(iIFId,fromData,curUserInfo);
+                }
+            }
+        } else {
+            int id = request.getInteger("id");
+            JSONObject fromData = infoformcreateMapper.selectFromDataOne(tableName,id);
+            notifyMessage(iIFId,fromData,curUserInfo);
+        }
+        JSONObject result = new JSONObject();
+        result.put("message","通知成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject reverseState(JSONObject request) {
+        if (request == null || request.get("iIFId") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Infoform infoform = infoformMapper.selectById(request.getInteger("iIFId"));
+        if (infoform == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (infoform.getCIFState().equals("发布")) {
+            infoform.setCIFState("停止");
+        } else if ("停止".equals(infoform.getCIFState())) {
+            infoform.setCIFState("发布");
+            pubconfigService.checkPubStopTime("CollectInfo",request.getInteger("iIFId"));
+        } else {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"该表单尚未发布，不允许停止！");
+        }
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        infoform.setCIF_cPICode_update(curUserInfo.getString("code"));
+        infoform.setCIFUpdateTime(new Date());
+        infoformMapper.updateById(infoform);
+        JSONObject result = new JSONObject();
+        result.put("message","操作成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject addFromDataPerson(JSONObject request) {
+        if (request == null || request.get("iIFId") == null
+                || request.get("codeArray") == null
+                || request.get("nameArray") == null
+                || request.get("orgArray") == null
+        ) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        JSONArray codes = request.getJSONArray("codeArray");
+        JSONArray names = request.getJSONArray("nameArray");
+        JSONArray orgs = request.getJSONArray("orgArray");
+        // 插入数据
+        insertFromDataPerson(request.getInteger("iIFId"),codes,names,orgs);
+        JSONObject result = new JSONObject();
+        result.put("message","操作成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject getPubState(JSONObject request) {
+        if (request == null || request.get("iIFId") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Infoform infoform = infoformMapper.selectById(request.getInteger("iIFId"));
+        JSONObject result = new JSONObject();
+        result.put("isPubed",!StringUtils.isEmpty(infoform.getCIFTableName()));
+        result.put("isPub","发布".equals(infoform.getCIFState()));
+        return result;
+    }
+
+    @Override
+    public JSONObject getInfoAndPersonData(JSONObject request) {
+        if (request == null || request.get("iIFId") == null || request.get("id") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String iIFId = request.getString("iIFId");
+        int id = request.getInteger("id");
+
+        // 获取用户数据
+        JSONObject personFromData = infoformcreateMapper.selectFromDataOne(getDataTableName(request.getInteger("iIFId")), id);
+        boolean isExits = personFromData != null;
+
+        ArrayList<JSONObject> containers = infoformcreateMapper.getContainerInfo(iIFId);
+        for (JSONObject container : containers) {
+            container.put("showBorder","true".equals(container.getString("showBorder")));
+            container.put("showRadius","true".equals(container.getString("showRadius")));
+            // 封装容器元素
+            ArrayList<JSONObject> childs = infoformcreateMapper.getChildInfo(iIFId,container.getString("iIFCId"));
+            if (!childs.isEmpty()) {
+                // 处理option数据
+                for (JSONObject child : childs) {
+                    child.put("showBorder","true".equals(child.getString("showBorder")));
+                    child.put("showRadius","true".equals(child.getString("showRadius")));
+                    child.put("showInnerBorder","true".equals(child.getString("showInnerBorder")));
+                    child.put("isNeed","true".equals(child.getString("isNeed")));
+                    if (!StringUtils.isEmpty(child.getString("options"))) {
+                        child.put("options",JSONArray.parseArray(convertToJson(child.getString("options"))));
+                    }
+                    // 非容器、文本、等数据字段重新处理
+                    String type = child.getString("type");
+                    if (!(!isExits ||"text".equals(type) || "container".equals(type))) {
+                        String fieldName = type+"-"+child.getString("id");
+                        switch (type) {
+                            case "input":
+                            case "textarea":
+                            case "select":
+                            case "radio":{
+                                if (personFromData.get(fieldName) != null) {
+                                    child.put("defaultText",personFromData.get(fieldName));
+                                }
+                                break;
+                            }
+
+                            case "checkbox": {
+                                if (personFromData.get(fieldName) != null) {
+                                    String data = personFromData.getString(fieldName);
+                                    child.put("defaultText",Arrays.asList(data.split(",")));
+                                } else {
+                                    child.put("defaultText",new ArrayList<>());
+                                }
+                                break;
+                            }
+                            case "time": {
+                                if (personFromData.get(fieldName) != null) {
+                                    child.put("defaultTime",personFromData.get(fieldName));
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                container.put("child",childs);
+            }
+        }
+        JSONObject result = new JSONObject();
+        Infoform infoForm = infoformMapper.selectById(iIFId);
+        int maxMetaId = infoformcreateMapper.getMetaId(iIFId);
+        if (isExits) {
+            String state = personFromData.getString("cState");
+            state = "0".equals(state) ? "未完成" : "1".equals(state) ? "已完成" : "待审批";
+            result.put("cState",state);
+        }
+        result.put("infoForm",infoForm);// 表单配置信息
+        result.put("containers",containers);// 表单元素信息
+        result.put("maxMetaId",maxMetaId);// 元素最大值ID
+        result.put("authority",checkAuthority(infoForm));// 当前登入人是否是管理员或者创建者
+        return result;
+    }
+
+    @Override
+    public JSONObject saveFromPersonData(JSONObject request) {
+        // 检查数据是否符合要求
+        JSONObject data = checkSaveData(request);
+        // 处理信息
+        String filed = data.getString("filed");
+        String fieldData = data.getString("fieldData");
+        String tableName = getDataTableName(request.getInteger("iIFId"));
+        // 是否需要添加审批
+        String cState = "1";
+        Pubconfig pubconfig = pubconfigService.getPubConfigByData("CollectInfo",request.getInteger("iIFId"));
+        Infoform infoform = infoformMapper.selectById(request.getInteger("iIFId"));
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        if ("true".equals(pubconfig.getCIsApproval())) {
+            cState = "2";
+            String approvalCode = null;
+            // 添加审批待办
+            if ("true".equals(pubconfig.getCIsOrgManger())) {
+                // 将待办添加给所属部门负责人
+                // 获取部门数据
+                List<String> orgs = organizationinfoService.getOrgCodesByPubConfig(pubconfig);
+                if (!orgs.isEmpty()) {
+                    approvalCode = organizationinfoService.selectPersonExitOrgs(curUserInfo.getString("code"),String.join(",",orgs));
+                    approvalCode = infoform.getCIF_cPICode_insert();
+                }
+                if (approvalCode == null) {
+                    approvalCode = infoform.getCIF_cPICode_insert();
+                }
+            }
+            if (approvalCode == null) {
+                approvalCode = infoform.getCIF_cPICode_insert();
+            }
+
+            Worktask worktask = new Worktask();
+            worktask.setType("CollectInfoApproval");
+            worktask.setTypeid(request.getInteger("iIFId"));
+            worktask.setCode(approvalCode);
+            worktask.setUpdatetime(new Date());
+            worktask.setContent("成员"+curUserInfo.getString("name")+"已提交"+infoform.getCIFTitle()+"信息表单收集，请审批！");
+            worktaskMapper.insert(worktask);
+        }
+
+        // 保存数据
+        JSONObject oldData = infoformcreateMapper.selectFromDataOne(tableName, request.getInteger("id"));
+        String insertSql = "insert into "+tableName+" ("+filed+"code,name,org,cState)"+" values ("+fieldData+"'"+oldData.getString("code")+"','" +
+                oldData.getString("name")+"','" +
+                oldData.getString("org")+"','"+cState+"')";
+        infoformcreateMapper.doExcuSql(insertSql);
+        // 作废之前的数据
+        String deleteSql = "update "+tableName+" set dataState = '1' where id = "+request.getInteger("id");
+        infoformcreateMapper.doExcuSql(deleteSql);
+
+        // 处理工作待办
+        Worktask worktask = worktaskMapper.selectById(request.getInteger("workTaskId"));
+        if ("2".equals(cState)) {
+            worktask.setState("完成");
+        } else {
+            worktask.setState("通过");
+        }
+        worktaskMapper.updateById(worktask);
+
+        JSONObject result = new JSONObject();
+        result.put("message","保存成功！");
+        return result;
+    }
+
+    private JSONObject checkSaveData(JSONObject request) {
+        if (request == null
+                || request.get("containers") == null
+                || request.get("workTaskId") == null
+                || request.get("iIFId") == null
+                || request.get("id") == null
+        ) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 字段
+        String filed = "";
+        // 数据
+        String fieldData = "";
+
+        ArrayList<HashMap<String,Object>> containerDatas = (ArrayList<HashMap<String,Object>>)request.get("containers");
+        for (HashMap<String,Object> container : containerDatas) {
+            ArrayList<HashMap<String,Object>> childs = (ArrayList<HashMap<String,Object>>)container.get("child");
+            for (HashMap<String,Object> child : childs) {
+                String type = child.get("type").toString();
+                // 判断是否必填
+                boolean isNeed = child.get("isNeed") != null && (boolean) child.get("isNeed");
+                if (isNeed) {
+                    if (child.get("defaultText") == null || StringUtils.isEmpty(child.get("defaultText").toString())) {
+                        throw new BusinessException(ErrorCode.PARAMS_ERROR,child.get("title").toString()+"不允许为空!");
+                    }
+                }
+                switch (type) {
+                    case "input":
+                    case "textarea":
+                    {
+                        // 最大字数
+                        int maxLength = Integer.parseInt(child.get("maxLength").toString());
+                        String content = "";
+                        if (child.get("defaultText") != null) {
+                            if (maxLength < child.get("defaultText").toString().length()) {
+                                throw new BusinessException(ErrorCode.OPERATION_ERROR,child.get("title").toString()+"不允许超过长度"+maxLength+"!");
+                            }
+                            content =  child.get("defaultText").toString();
+                        }
+
+                        filed += "`"+type+"-"+child.get("id")+ "`,";
+                        fieldData += "'"+content+"',";
+                        break;
+                    }
+                    case "select":
+                    case "radio": {
+                        String content = "";
+                        if (child.get("defaultText") != null) {
+                            content =  child.get("defaultText").toString();
+                        }
+
+                        filed += "`"+type+"-"+child.get("id")+ "`,";
+                        fieldData += "'"+content+"',";
+                        break;
+                    }
+                    // 多选处理
+                    case "checkbox": {
+                        if (child.get("defaultText") != null) {
+                            String content = child.get("defaultText").toString();
+                            content = content.substring(1,content.length()-1);
+                            if (content.split(",").length > Integer.valueOf(child.get("maxOption").toString())
+                                    && content.split(",").length < Integer.valueOf(child.get("minOption").toString())) {
+                                throw new BusinessException(ErrorCode.OPERATION_ERROR,
+                                        child.get("title").toString()+"请选择"+child.get("minOption").toString()+"~"+child.get("maxOption").toString()+"个选项！");
+                            }
+                            filed += "`"+type+"-"+child.get("id")+ "`,";
+                            fieldData += "'"+content+"',";
+                        }
+                        break;
+                    }
+                    case "time": {
+                        if (child.get("defaultTime") != null) {
+                            JSONObject meta = new JSONObject(child);
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            filed += "`"+type+"-"+child.get("id")+ "`,";
+                            fieldData += "'"+formatter.format(meta.getDate("defaultTime"))+"',";
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.put("filed",filed);
+        result.put("fieldData",fieldData);
+        return result;
+    }
+
+    @Override
+    public JSONObject getFromDataId(JSONObject request) {
+        if (request == null || request.get("iIFId") == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 判断该表单收集是否已经停止
+        Infoform infoform = infoformMapper.selectById(request.getInteger("iIFId"));
+        if ("停止".equals(infoform.getCIFState())) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"该收集表单已停止！");
+        }
+
+        // 查询当前人的记录信息
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        JSONObject data = infoformcreateMapper.getPersonData(infoform.getCIFTableName(), curUserInfo.getString("code"));
+        if (data == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        JSONObject result = new JSONObject();
+        result.put("id",data.getInteger("id"));
+        return result;
+    }
+
+    private void insertFromDataPerson(Integer iIFId, JSONArray codes, JSONArray names, JSONArray orgs) {
+        // 查看是否是发布中
+        Infoform infoform = infoformMapper.selectById(iIFId);
+        String tableName = getDataTableName(iIFId);
+        if (infoform == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (!"发布".equals(infoform.getCIFState())) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"该表单尚未发布，不允许新增！");
+        }
+        List<JSONObject> fromDataList = infoformcreateMapper.getFromDataListByTableName(tableName);
+        HashSet<String> exitsCodes = new HashSet<>();// 当前表单存在的人员编码
+        for (JSONObject data : fromDataList) {
+            exitsCodes.add(data.getString("code"));
+        }
+
+        String tempSql = "insert into "+tableName+" ( code,name,org ) values (";
+        String insertSql = tempSql;
+        for (int i = 0; i < codes.size(); i++) {
+            if (exitsCodes.contains(codes.get(i).toString())) {
+                continue;
+            }
+            insertSql += "'"+codes.get(i)+"','"+names.get(i)+"','"+orgs.get(i)+"'";
+            // 进行插入
+            insertSql += ") ";
+            infoformcreateMapper.doExcuSql(insertSql);
+            insertSql = tempSql;
+        }
+    }
+
+    private void notifyMessage(int iIFId, JSONObject fromData, JSONObject curUserInfo) {
+        Infoform infoform = infoformMapper.selectById(iIFId);
+        Workmessage workmessage = new Workmessage();
+        workmessage.setType("collectInfo");
+        workmessage.setTypeId(iIFId);
+        workmessage.setPersonCode(fromData.getString("code"));
+        workmessage.setPersonName(fromData.getString("name"));
+        workmessage.setContent("管理员通知您尽管完成"+infoform.getCIFTitle()+"信息表单填写！");
+        workmessage.setHandler(curUserInfo.getString("name"));
+        workmessage.setHandleTime(new Date());
+        workmessageMapper.insert(workmessage);
+    }
+
+    /**
+     * 获取表名
+     * @param iIFId 信息收集配置表id
+     */
+    private String getDataTableName(Integer iIFId) {
+        Infoform infoform = infoformMapper.selectById(iIFId);
+        if (infoform == null || StringUtils.isEmpty(infoform.getCIFTableName()))
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        return infoform.getCIFTableName();
+    }
+
     /**
      * 创建表单数据表
      * @param iIFId 表单配置ID
@@ -305,6 +723,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             "`id` INT NOT NULL AUTO_INCREMENT COMMENT '自增主键'," +
             "`code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '人员编号'," +
             "`name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '人员名称'," +
+            "`org` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '所属部门名称'," +
             "`dCreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',"+
             "`dUpdateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',"+
             "`cState` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '0' COMMENT '状态（0：未完成；1：已完成；2：待审批）'," +

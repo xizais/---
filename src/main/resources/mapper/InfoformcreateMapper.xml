@@ -58,11 +58,33 @@
     <select id="getMetaId" resultType="java.lang.Integer">
         select max(id) from infoformcreate where iIFC_iIFId = #{iIFId}
     </select>
+    <select id="getFromDataListByTableName" resultType="com.alibaba.fastjson.JSONObject">
+        select id,
+                code,
+                name,
+                org,
+                CASE cState
+                   WHEN 0 THEN '未完成'
+                   WHEN 1 THEN '已完成'
+                   WHEN 2 THEN '待审批'
+                END AS state
+        from ${tableName} where dataState = 0
+        order by id desc
+    </select>
+    <select id="selectFromDataOne" resultType="com.alibaba.fastjson.JSONObject">
+        select * from ${tableName} where id = #{id} and dataState = 0
+    </select>
+    <select id="getPersonData" resultType="com.alibaba.fastjson.JSONObject">
+        select * from ${tableName} where dataState = 0 and code = #{code}
+    </select>
     <update id="deleteFromDataTable">
         DROP TABLE IF EXISTS `${tableName}`;
     </update>
     <update id="createFromDataTable">
         ${createSql}
+    </update>
+    <update id="doExcuSql">
+        ${excuSql}
     </update>
     <update id="batchInsert">
         INSERT INTO ${tableName} (name, code)

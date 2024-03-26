@@ -48,23 +48,6 @@ public class CollectInfoController {
         }
     }
 
-//    /**
-//     * 保存表单发布配置（发布）
-//     */
-//    @RequestMapping("/saveCollectSetting")
-//    @ResponseBody
-//    public BaseResponse<JSONObject> saveCollectSetting(@RequestBody JSONObject request){
-//        if (((ArrayList<JSONObject>)request.get("container")).size() == 0) {
-//            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"不允许创建空表单！");
-//        }
-//        JSONObject result = collectInfoService.saveCollectInfo((ArrayList<JSONObject>)request.get("container"),true,1);
-//        if (result.get("msg")!=null) {
-//            return ResultUtils.error(ErrorCode.OPERATION_ERROR,(String)request.get("msg"));
-//        } else {
-//            return ResultUtils.success(result);
-//        }
-//    }
-
     /**
      * 返回列表数据
      */
@@ -84,6 +67,15 @@ public class CollectInfoController {
     }
 
     /**
+     * 返回表单数据和用户数据
+     */
+    @PostMapping("/getCollectInfoAndPersonData")
+    @ResponseBody
+    public BaseResponse<JSONObject> getCollectInfoAndPersonData(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.getInfoAndPersonData(request));
+    }
+
+    /**
      * 删除表单
      */
     @PostMapping("/deleteCollectInfo")
@@ -99,5 +91,77 @@ public class CollectInfoController {
     @ResponseBody
     public BaseResponse<JSONObject> pubCollectInfo(@RequestBody JSONObject request){
         return ResultUtils.success(collectInfoService.pubCollectInfo(request));
+    }
+
+    /**
+     * 获取表单收集用户的数据
+     */
+    @PostMapping("/getFromData")
+    @ResponseBody
+    public BaseResponse<JSONObject> getFromData(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.getFromData(request));
+    }
+
+    /**
+     * 删除个人表单数据
+     */
+    @PostMapping("/deleteCollectDataById")
+    @ResponseBody
+    public BaseResponse<JSONObject> deleteCollectDataById(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.deleteDataById(request));
+    }
+
+    /**
+     * 添加个人表单数据
+     */
+    @PostMapping("/addFromDataPerson")
+    @ResponseBody
+    public BaseResponse<JSONObject> addFromDataPerson(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.addFromDataPerson(request));
+    }
+
+    /**
+     * 通知信息收集表单用户完成提交
+     */
+    @PostMapping("/clickNotify")
+    @ResponseBody
+    public BaseResponse<JSONObject> clickNotify(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.clickNotify(request));
+    }
+
+    /**
+     * 停止/启动发布
+     */
+    @PostMapping("/reverseState")
+    @ResponseBody
+    public BaseResponse<JSONObject> reverseState(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.reverseState(request));
+    }
+
+    /**
+     * 获得发布状态
+     */
+    @PostMapping("/getPubState")
+    @ResponseBody
+    public BaseResponse<JSONObject> getPubState(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.getPubState(request));
+    }
+
+    /**
+     * 保存个人数据
+     */
+    @PostMapping("/saveFromPersonData")
+    @ResponseBody
+    public BaseResponse<JSONObject> saveFromPersonData(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.saveFromPersonData(request));
+    }
+
+    /**
+     * 获取当前处理人对应收集表单的记录ID
+     */
+    @PostMapping("/getFromDataId")
+    @ResponseBody
+    public BaseResponse<JSONObject> getFromDataId(@RequestBody JSONObject request){
+        return ResultUtils.success(collectInfoService.getFromDataId(request));
     }
 }

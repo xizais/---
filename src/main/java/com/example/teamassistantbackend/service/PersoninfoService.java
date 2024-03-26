@@ -17,4 +17,5 @@ public interface PersoninfoService extends IService<Personinfo> {
     void logout();//用户登出
     JSONObject getCurUserInfo();//获取当前用户信息
 
+    String getPersonName(String code);// 通过人员编码获取人员名称
 }

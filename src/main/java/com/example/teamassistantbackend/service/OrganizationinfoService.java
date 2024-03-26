@@ -3,8 +3,8 @@ package com.example.teamassistantbackend.service;
 import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Organizationinfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.teamassistantbackend.entity.Pubconfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,4 +14,7 @@ import java.util.List;
 */
 public interface OrganizationinfoService extends IService<Organizationinfo> {
     public List<JSONObject> getPersonCodeList(String personCodes, String orgCodes, String flagCodes);
+    public List<String> getOrgCodesByPubConfig(Pubconfig pubconfig);// 通过发布配置获取部门编号
+
+    String selectPersonExitOrgs(String personCode, String orgs);// 查询这个人员编码是否存在对应的组织中
 }

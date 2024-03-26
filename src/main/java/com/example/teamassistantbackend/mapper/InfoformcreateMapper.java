@@ -23,10 +23,17 @@ public interface InfoformcreateMapper extends BaseMapper<Infoformcreate> {
     int getMetaId(String iIFId);
 
     void createFromDataTable(String createSql);
+    void doExcuSql(String excuSql);// 执行sql
+
 
     void deleteFromDataTable(String tableName);
 
     void batchInsert(@Param(value = "tableName") String tableName, @Param(value = "personCodeList") List<JSONObject> personCodeList);
+
+    List<JSONObject> getFromDataListByTableName(String tableName);// 获取表单数据
+
+    JSONObject selectFromDataOne(@Param(value = "tableName")String tableName,@Param(value = "id") int id);
+    JSONObject getPersonData(@Param(value = "tableName")String tableName,@Param(value = "code") String code);
 }
 
 

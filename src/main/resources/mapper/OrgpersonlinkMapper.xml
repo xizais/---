@@ -20,4 +20,7 @@
     <select id="getPersonCodeByOrgCode" resultType="java.lang.String">
         select distinct cOPL_cPICode from OrgPersonLink where cOPL_cOICode in (${orgCodes}) and iOPLPersonStatus = 1;
     </select>
+    <select id="selectPersonByPersonCodeAndOrgCodes" resultType="com.alibaba.fastjson.JSONObject">
+        select * from orgpersonlink where cOPL_cOICode in (#{orgs}) and cOPL_cPICode = #{personCode}
+    </select>
 </mapper>

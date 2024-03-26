@@ -47,4 +47,5 @@ public class PubConfigController {
     public BaseResponse<JSONObject> getPubObjectInfo(){
         return ResultUtils.success(pubconfigService.getPubObjectList());
     }
+
 }

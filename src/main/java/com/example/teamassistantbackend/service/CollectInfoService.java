@@ -15,4 +15,22 @@ public interface CollectInfoService {
     public String deleteCollect(JSONObject request);// 删除（更新状态为删除）表单
 
     public JSONObject pubCollectInfo(JSONObject request);
+
+    public JSONObject deleteDataById(JSONObject request);
+
+    public JSONObject getFromData(JSONObject request);
+
+    public JSONObject clickNotify(JSONObject request);
+
+    public JSONObject reverseState(JSONObject request);
+
+    public JSONObject addFromDataPerson(JSONObject request);
+
+    public JSONObject getPubState(JSONObject request);
+
+    public JSONObject getInfoAndPersonData(JSONObject request);// 获取用户数据、表单数据
+
+    public JSONObject saveFromPersonData(JSONObject request);
+
+    public JSONObject getFromDataId(JSONObject request);
 }

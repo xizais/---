@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.NoticemanagerMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Noticemanager">
+            <id property="iNMId" column="iNMId" jdbcType="INTEGER"/>
+            <result property="cNMManagerCodes" column="cNMManagerCodes" jdbcType="VARCHAR"/>
+            <result property="cNMPubName" column="cNMPubName" jdbcType="VARCHAR"/>
+            <result property="cNMTitle" column="cNMTitle" jdbcType="VARCHAR"/>
+            <result property="cNMContent" column="cNMContent" jdbcType="VARCHAR"/>
+            <result property="cNMState" column="cNMState" jdbcType="VARCHAR"/>
+            <result property="dNMCreateTime" column="dNMCreateTime" jdbcType="TIMESTAMP"/>
+            <result property="dNMUpdateTime" column="dNMUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="cNMCreaterCode" column="cNMCreaterCode" jdbcType="VARCHAR"/>
+            <result property="cNMUpdaterCode" column="cNMUpdaterCode" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iNMId,cNMManagerCodes,cNMPubName,
+        cNMTitle,cNMContent,cNMState,
+        dNMCreateTime,dNMUpdateTime,cNMCreaterCode,
+        cNMUpdaterCode,dataState
+    </sql>
+    <select id="getInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            DATE_FORMAT(dNMCreateTime, '%Y-%m-%d %H:%i:%s') as dNMCreateTime,
+            DATE_FORMAT(dNMUpdateTime, '%Y-%m-%d %H:%i:%s') as dNMUpdateTime,
+            iNMId,cNMManagerCodes,cNMPubName,
+            cNMTitle,cNMContent,cNMState,
+            cNMCreaterCode,cNMUpdaterCode,dataState
+        from noticemanager where dataState = '0' and cNMManagerCodes = #{code} order by dNMUpdateTime desc
+    </select>
+</mapper>
