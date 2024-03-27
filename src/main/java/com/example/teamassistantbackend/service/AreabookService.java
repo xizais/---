@@ -12,4 +12,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface AreabookService extends IService<Areabook> {
 
     JSONObject addAreaBook(JSONObject request);
+
+    JSONObject deleteAreaBook(JSONObject request);
+
+    JSONObject getAreaBookList();
+
+    JSONObject getAreaBookInfo(JSONObject request);
 }

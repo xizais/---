@@ -23,6 +23,15 @@
         cABState,dABCreateTime,dABUpdateTime,
         dataState
     </sql>
+    <select id="selectInfo">
+        select
+            DATE_FORMAT(dABBookStartTime, '%Y-%m-%d %H:%i:%s') as dABBookStartTime,
+            DATE_FORMAT(dABBookEndTime, '%Y-%m-%d %H:%i:%s') as dABBookEndTime,
+            iABId,iAB_iAIId,cABBookerCode,
+            cABContent,cABState
+        from areaBook
+        where iABId = #{iABId}
+    </select>
     <select id="getDoneBookABIds" resultType="java.lang.String">
         SELECT GROUP_CONCAT(iAB_iAIId SEPARATOR ',') AS ids
             FROM areaBook
@@ -49,5 +58,16 @@
             and ((dABBookStartTime  &lt;= #{data.dABBookStartTime} and dABBookEndTime &gt;= #{data.dABBookStartTime})
             or (dABBookStartTime  &lt;= #{data.dABBookEndTime} and dABBookEndTime &gt;= #{data.dABBookEndTime})
             or (dABBookEndTime  &lt;= #{data.dABBookEndTime} and dABBookStartTime &gt;= #{data.dABBookStartTime}))
+    </select>
+    <select id="getInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            DATE_FORMAT(dABBookStartTime, '%Y-%m-%d %H:%i:%s') as dABBookStartTime,
+            DATE_FORMAT(dABBookEndTime, '%Y-%m-%d %H:%i:%s') as dABBookEndTime,
+            iABId,iAB_iAIId,cABBookerCode,
+            cABContent,cABState
+        from areaBook
+        WHERE
+            dataState = '0'
+            and cABBookerCode = #{code}
     </select>
 </mapper>

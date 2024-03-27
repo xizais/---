@@ -13,6 +13,9 @@ import com.example.teamassistantbackend.service.PersoninfoService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 /**
 * @author huang
@@ -50,12 +53,62 @@ public class AreabookServiceImpl extends ServiceImpl<AreabookMapper, Areabook>
         areabook.setCABBookerCode(areainfo.getCAIManagerName());
         areabook.setDABBookStartTime(request.getDate("dABBookStartTime"));
         areabook.setDABBookEndTime(request.getDate("dABBookEndTime"));
-//        areabook.setCABState(isApproval?"");
-//        areabook.setDABCreateTime();
-//        areabook.setDABUpdateTime();
-//        areabook.setDataState();
+        if (isApproval) {
+            areabook.setCABState("待审批");
 
-        return null;
+
+
+
+
+            // 增加一个工作待办--》前端也要进行修改
+
+
+
+
+
+
+
+        }
+        areabook.setDABCreateTime(new Date());
+        areabook.setDABUpdateTime(new Date());
+        areabookMapper.insert(areabook);
+        JSONObject result = new JSONObject();
+        result.put("message","预约成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject deleteAreaBook(JSONObject request) {
+        if (request == null || request.get("iABId") == null ) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Areabook areabook = areabookMapper.selectById(request.getInteger("iABId"));
+        if (areabook == null ) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        areabook.setDataState("1");
+        areabookMapper.updateById(areabook);
+        JSONObject result = new JSONObject();
+        result.put("message","预约成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject getAreaBookList() {
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        List<JSONObject> infoList = areabookMapper.getInfoList(curUserInfo.getString("name"));
+        JSONObject result = new JSONObject();
+        result.put("infoList",infoList);
+        return result;
+    }
+
+    @Override
+    public JSONObject getAreaBookInfo(JSONObject request) {
+        if (request == null || request.get("iABId") == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        JSONObject result = areabookMapper.selectInfo(request.getInteger("iABId"));
+        return result;
     }
 }
 

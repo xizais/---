@@ -85,7 +85,7 @@ public class AreainfoServiceImpl extends ServiceImpl<AreainfoMapper, Areainfo>
         areainfo.setDataState("1");
         areainfoMapper.updateById(areainfo);
         JSONObject result = new JSONObject();
-        result.put("message","保存成功！");
+        result.put("message","删除成功！");
         return result;
     }
 

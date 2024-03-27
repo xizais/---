@@ -74,13 +74,28 @@ public class AreaController {
     /**
      * 场地预约信息删除
      */
+    @PostMapping("/deleteAreaBook")
+    @ResponseBody
+    public BaseResponse<JSONObject> deleteAreaBook(@RequestBody JSONObject request){
+        return ResultUtils.success(areabookService.deleteAreaBook(request));
+    }
 
     /**
      * 场地预约信息列表
      */
+    @PostMapping("/getAreaBookList")
+    @ResponseBody
+    public BaseResponse<JSONObject> getAreaBookList(){
+        return ResultUtils.success(areabookService.getAreaBookList());
+    }
 
     /**
      * 场地预约信息详情
      */
+    @PostMapping("/getAreaBookInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> getAreaBookInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(areabookService.getAreaBookInfo(request));
+    }
 
 }
