@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.AreabookMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Areabook">
+            <id property="iABId" column="iABId" jdbcType="INTEGER"/>
+            <result property="iAB_iAIId" column="iAB_iAIId" jdbcType="INTEGER"/>
+            <result property="cABBookerCode" column="cABBookerCode" jdbcType="VARCHAR"/>
+            <result property="dABBookStartTime" column="dABBookStartTime" jdbcType="TIMESTAMP"/>
+            <result property="dABBookEndTime" column="dABBookEndTime" jdbcType="TIMESTAMP"/>
+            <result property="cABContent" column="cABContent" jdbcType="VARCHAR"/>
+            <result property="cABState" column="cABState" jdbcType="VARCHAR"/>
+            <result property="dABCreateTime" column="dABCreateTime" jdbcType="TIMESTAMP"/>
+            <result property="dABUpdateTime" column="dABUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iABId,iAB_iAIId,cABBookerCode,
+        dABBookStartTime,dABBookEndTime,cABContent,
+        cABState,dABCreateTime,dABUpdateTime,
+        dataState
+    </sql>
+    <select id="getDoneBookABIds" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(iAB_iAIId SEPARATOR ',') AS ids
+            FROM areaBook
+        WHERE
+            dataState = '0'
+            and cABState = '已通过'
+        <choose>
+            <when test="data.searchData.showOther != null and data.searchData.showOther == true">
+                <if test="(data.searchData.startDate != null and data.searchData.startDate != '')">
+                    and dABBookStartTime  &lt;= #{data.searchData.startDate} and dABBookEndTime &gt;= #{data.searchData.startDate}
+                </if>
+                <if test="(data.searchData.endDate != null and data.searchData.endDate != '')">
+                    and dABBookStartTime  &lt;= #{data.searchData.endDate} and dABBookEndTime &gt;= #{data.searchData.endDate}
+                </if>
+                <if test="(data.searchData.startDate != null and data.searchData.startDate != '') and (data.searchData.endDate != null and data.searchData.endDate != '')">
+                    and dABBookEndTime  &lt;= #{data.searchData.endDate} and dABBookStartTime &gt;= #{data.searchData.startDate}
+                </if>
+            </when>
+            <otherwise>
+                AND 1 = 0
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

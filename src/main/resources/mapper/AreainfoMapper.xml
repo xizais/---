@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.AreainfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Areainfo">
+            <id property="iAIId" column="iAIId" jdbcType="INTEGER"/>
+            <result property="cAIManagerCode" column="cAIManagerCode" jdbcType="VARCHAR"/>
+            <result property="cAIManagerName" column="cAIManagerName" jdbcType="VARCHAR"/>
+            <result property="cAIManagerPhone" column="cAIManagerPhone" jdbcType="VARCHAR"/>
+            <result property="cAIName" column="cAIName" jdbcType="VARCHAR"/>
+            <result property="cAIContent" column="cAIContent" jdbcType="VARCHAR"/>
+            <result property="bAIIsEnable" column="bAIIsEnable" jdbcType="BIT"/>
+            <result property="bAIIsApprove" column="bAIIsApprove" jdbcType="BIT"/>
+            <result property="dAICreateTime" column="dAICreateTime" jdbcType="TIMESTAMP"/>
+            <result property="dAIUpdateTime" column="dAIUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="cAIHandleCode" column="cAIHandleCode" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iAIId,cAIManagerCode,cAIManagerName,
+        cAIManagerPhone,cAIName,cAIContent,
+        bAIIsEnable,bAIIsApprove,dAICreateTime,
+        dAIUpdateTime,cAIHandleCode,dataState
+    </sql>
+    <select id="getInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select ai.* from areainfo ai
+                 where ai.dataState = '0'
+        <if test="data.ids != null and data.ids != ''">
+            and ai.iAIId not in (#{data.ids})
+        </if>
+        limit #{data.pageData.pageSize} OFFSET #{data.pageData.offset}
+    </select>
+    <select id="selectInfo" resultType="com.alibaba.fastjson.JSONObject">
+        select * from areainfo where iAIId = #{iAIId}
+    </select>
+</mapper>
