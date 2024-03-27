@@ -31,7 +31,9 @@
         <if test="data.ids != null and data.ids != ''">
             and ai.iAIId not in (#{data.ids})
         </if>
-        limit #{data.pageData.pageSize} OFFSET #{data.pageData.offset}
+        <if test="data.pageData != null and data.pageData != ''">
+            limit #{data.pageData.pageSize} OFFSET #{data.pageData.offset}
+        </if>
     </select>
     <select id="selectInfo" resultType="com.alibaba.fastjson.JSONObject">
         select * from areainfo where iAIId = #{iAIId}
