@@ -66,4 +66,13 @@ public class NoticeManagerController {
     public BaseResponse<JSONObject> pubNotify(@RequestBody JSONObject request){
         return ResultUtils.success(noticemanagerService.pubNotify(request));
     }
+
+    /**
+     * 获取用户详情信息
+     */
+    @PostMapping("/getNotifyPersonDataList")
+    @ResponseBody
+    public BaseResponse<JSONObject> getNotifyPersonDataList(@RequestBody JSONObject request){
+        return ResultUtils.success(noticemanagerService.getDataList(request));
+    }
 }

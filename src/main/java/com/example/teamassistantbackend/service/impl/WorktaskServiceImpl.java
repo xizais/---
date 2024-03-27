@@ -140,7 +140,11 @@ public class WorktaskServiceImpl extends ServiceImpl<WorktaskMapper, Worktask>
         if (request == null || request.get("id") == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        worktaskMapper.deleteById(request.getInteger("id"));
+        Worktask worktask = worktaskMapper.selectById(request.getInteger("id"));
+        if (worktask != null) {
+            worktask.setDatastate("1");
+            worktaskMapper.updateById(worktask);
+        }
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("message","删除成功!");
         return jsonObject;

@@ -142,12 +142,26 @@ public class NoticemanagerServiceImpl extends ServiceImpl<NoticemanagerMapper, N
             worktask.setTypeid(request.getInteger("iTypeId"));
             worktask.setCode(personInfo.getString("code"));
             worktask.setUpdatetime(new Date());
+            worktask.setState("待确认");
             worktask.setContent(pubconfig.getCPuber()+"发布了通知《"+noticemanager.getCNMTitle()+"》，请确认！");
             worktaskList.add(worktask);
         }
         worktaskService.saveBatch(worktaskList);
         JSONObject result = new JSONObject();
         result.put("message","发布成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject getDataList(JSONObject request) {
+        if (request == null || request.get("typeId") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<JSONObject> notifyPersonData = noticemanagerMapper.getPersonData(request);
+        int doneAmont = noticemanagerMapper.getPersonDataDontMount(request);
+        JSONObject result = new JSONObject();
+        result.put("notifyPersonData",notifyPersonData);
+        result.put("doneAmont",doneAmont);
         return result;
     }
 

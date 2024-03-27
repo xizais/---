@@ -3,6 +3,7 @@ package com.example.teamassistantbackend.mapper;
 import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Noticemanager;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,6 +16,10 @@ import java.util.List;
 public interface NoticemanagerMapper extends BaseMapper<Noticemanager> {
 
     List<JSONObject> getInfoList(String code);
+
+    List<JSONObject> getPersonData(@Param(value = "data") JSONObject request);
+
+    int getPersonDataDontMount(@Param(value = "data") JSONObject request);
 }
 
 

@@ -33,4 +33,15 @@
             cNMCreaterCode,cNMUpdaterCode,dataState
         from noticemanager where dataState = '0' and cNMManagerCodes = #{code} order by dNMUpdateTime desc
     </select>
+    <select id="getPersonData" resultType="com.alibaba.fastjson.JSONObject">
+        select code,pi.cPIName name,state from worktask wt
+                     left join personinfo pi on pi.cPICode = wt.code
+        where type = 'Notify'
+        and typeId = #{data.typeId}
+    </select>
+    <select id="getPersonDataDontMount" resultType="java.lang.Integer">
+        select count(*) from worktask
+        where type = 'Notify'
+        and state = '已确认'
+    </select>
 </mapper>

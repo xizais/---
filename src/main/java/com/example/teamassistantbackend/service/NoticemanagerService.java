@@ -20,4 +20,6 @@ public interface NoticemanagerService extends IService<Noticemanager> {
     JSONObject getInfo(JSONObject request);
 
     JSONObject pubNotify(JSONObject request);
+
+    JSONObject getDataList(JSONObject request);
 }
