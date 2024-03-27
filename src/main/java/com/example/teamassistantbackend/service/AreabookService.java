@@ -1,5 +1,6 @@
 package com.example.teamassistantbackend.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Areabook;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,4 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface AreabookService extends IService<Areabook> {
 
+    JSONObject addAreaBook(JSONObject request);
 }

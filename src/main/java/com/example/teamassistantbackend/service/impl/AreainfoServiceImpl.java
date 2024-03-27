@@ -97,7 +97,9 @@ public class AreainfoServiceImpl extends ServiceImpl<AreainfoMapper, Areainfo>
             request.put("ids",doneBookId);
         }
         List<JSONObject> infoList = areainfoMapper.getInfoList(request);
-        return null;
+        JSONObject result = new JSONObject();
+        result.put("infoList",infoList);
+        return result;
     }
 
     @Override

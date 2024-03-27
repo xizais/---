@@ -3,6 +3,7 @@ package com.example.teamassistantbackend.mapper;
 import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Areabook;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author huang
@@ -12,7 +13,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface AreabookMapper extends BaseMapper<Areabook> {
 
-    String getDoneBookABIds(JSONObject request);
+    String getDoneBookABIds(@Param(value = "data") JSONObject request);
+
+    int checkTime(@Param(value = "data") JSONObject request);
 }
 
 

@@ -65,6 +65,11 @@ public class AreaController {
     /**
      * 场地预约
      */
+    @PostMapping("/addAreaBook")
+    @ResponseBody
+    public BaseResponse<JSONObject> addAreaBook(@RequestBody JSONObject request){
+        return ResultUtils.success(areabookService.addAreaBook(request));
+    }
 
     /**
      * 场地预约信息删除
