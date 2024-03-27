@@ -38,4 +38,11 @@
     <select id="selectInfo" resultType="com.alibaba.fastjson.JSONObject">
         select * from areainfo where iAIId = #{iAIId}
     </select>
+    <select id="getInfoListAmount" resultType="java.lang.Integer">
+        select count(*) from areainfo ai
+        where ai.dataState = '0'
+        <if test="data.ids != null and data.ids != ''">
+            and ai.iAIId not in (#{data.ids})
+        </if>
+    </select>
 </mapper>

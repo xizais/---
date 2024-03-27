@@ -32,14 +32,26 @@ public class AreainfoServiceImpl extends ServiceImpl<AreainfoMapper, Areainfo>
     AreabookMapper areabookMapper;
     @Override
     public JSONObject addAreaInfo(JSONObject request) {
-        if (request == null
-                || request.get("cAIName") == null
-                || request.get("cAIContent") == null
-                || request.get("bAIIsEnable") == null
-                || request.get("bAIIsApprove") == null
-                || request.get("cAIManagerName") == null
-        ) {
+        if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (request.get("cAIName") == null) {
+          throw new BusinessException(ErrorCode.PARAMS_ERROR,"请填写场地名称信息！");
+        }
+        if (request.get("cAIContent") == null) {
+          throw new BusinessException(ErrorCode.PARAMS_ERROR,"请填写场地内容信息！");
+        }
+        if (request.get("bAIIsEnable") == null) {
+          throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择是否启用信息！");
+        }
+        if (request.get("bAIIsApprove") == null) {
+          throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择是否审批信息！");
+        }
+        if (request.get("cAIManagerName") == null) {
+          throw new BusinessException(ErrorCode.PARAMS_ERROR,"请填写联系人信息！");
+        }
+        if (request.get("cAIManagerPhone") == null) {
+          throw new BusinessException(ErrorCode.PARAMS_ERROR,"请填写联系人联系方式信息！");
         }
         // 获取个人信息
         JSONObject curUserInfo = personinfoService.getCurUserInfo();
@@ -91,14 +103,27 @@ public class AreainfoServiceImpl extends ServiceImpl<AreainfoMapper, Areainfo>
 
     @Override
     public JSONObject getAreaInfoList(JSONObject request) {
+        if (request == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (request.get("searchData") != null && request.get("searchData") !=null && request.getBoolean("searchData")) {
+            if (request.get("startDate") == null) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择预约开始时间！");
+            }
+            if (request.get("endDate") == null) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择预约结束时间！！");
+            }
+        }
         // 查询时间段内的已经预约的场地
         String doneBookId = getDoneBookId(request);
         if (StringUtils.isNotEmpty(doneBookId)) {
             request.put("ids",doneBookId);
         }
         List<JSONObject> infoList = areainfoMapper.getInfoList(request);
+        int amount = areainfoMapper.getInfoListAmount(request);
         JSONObject result = new JSONObject();
         result.put("infoList",infoList);
+        result.put("amount",amount);
         return result;
     }
 

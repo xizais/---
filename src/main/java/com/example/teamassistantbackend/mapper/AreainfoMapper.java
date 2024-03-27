@@ -18,6 +18,8 @@ public interface AreainfoMapper extends BaseMapper<Areainfo> {
     List<JSONObject> getInfoList(@Param(value = "data") JSONObject data);
 
     JSONObject selectInfo(String iAIId);
+
+    int getInfoListAmount(@Param(value = "data") JSONObject request);
 }
 
 

@@ -1,5 +1,6 @@
 package com.example.teamassistantbackend.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Taskmanager;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,4 +11,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface TaskmanagerService extends IService<Taskmanager> {
 
+    JSONObject saveTaskInfo(JSONObject request);
+
+    JSONObject getInfoList(JSONObject request);
 }
