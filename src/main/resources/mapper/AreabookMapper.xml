@@ -64,10 +64,11 @@
             DATE_FORMAT(dABBookStartTime, '%Y-%m-%d %H:%i:%s') as dABBookStartTime,
             DATE_FORMAT(dABBookEndTime, '%Y-%m-%d %H:%i:%s') as dABBookEndTime,
             iABId,iAB_iAIId,cABBookerCode,
-            cABContent,cABState
-        from areaBook
+            cABContent,cABState,ai.*
+        from areaBook ab
+        left join areaInfo ai on ai.iAIId = ab.iAB_iAIId
         WHERE
-            dataState = '0'
+            ab.dataState = '0'
             and cABBookerCode = #{code}
     </select>
 </mapper>

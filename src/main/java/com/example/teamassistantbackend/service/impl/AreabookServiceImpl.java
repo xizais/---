@@ -46,11 +46,12 @@ public class AreabookServiceImpl extends ServiceImpl<AreabookMapper, Areabook>
         if (mount > 0) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"该预约时间系统已存在，不允许预约！");
         }
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
         Areainfo areainfo = areainfoMapper.selectById(request.getInteger("iAIId"));
         boolean isApproval = areainfo.getBAIIsApprove();
         Areabook areabook = new Areabook();
         areabook.setIAB_iAIId(request.getInteger("iAIId"));
-        areabook.setCABBookerCode(areainfo.getCAIManagerName());
+        areabook.setCABBookerCode(curUserInfo.getString("name"));
         areabook.setDABBookStartTime(request.getDate("dABBookStartTime"));
         areabook.setDABBookEndTime(request.getDate("dABBookEndTime"));
         if (isApproval) {
