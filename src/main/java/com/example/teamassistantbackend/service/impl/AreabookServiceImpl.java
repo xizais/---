@@ -90,7 +90,7 @@ public class AreabookServiceImpl extends ServiceImpl<AreabookMapper, Areabook>
         areabook.setDataState("1");
         areabookMapper.updateById(areabook);
         JSONObject result = new JSONObject();
-        result.put("message","预约成功！");
+        result.put("message","删除成功！");
         return result;
     }
 

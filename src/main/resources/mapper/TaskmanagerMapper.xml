@@ -34,54 +34,61 @@
             cTMState,cTMCreaterCode,cTMUpdaterCode
         from taskmanager
         where dataState = '0'
-        <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
-            AND (cTMPubName like CONCAT('%', #{data.searchData.searchInput}, '%')
-            OR cTMTitle like CONCAT('%', #{data.searchData.searchInput}, '%')
-            )
-        </if>
-        <if test="data.searchData.showOther != null and data.searchData.showOther == true">
-            <if test="data.searchData.startDate != null and data.searchData.startDate != ''">
-                AND dTMCreateTime &gt;= #{data.searchData.startDate} -- 大于等于
+        <if test="data.searchData != null and data.searchData != ''">
+            <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
+                AND (cTMPubName like CONCAT('%', #{data.searchData.searchInput}, '%')
+                OR cTMTitle like CONCAT('%', #{data.searchData.searchInput}, '%')
+                )
             </if>
-            <if test="data.searchData.endDate != null and data.searchData.endDate != ''">
-                AND dTMUpdateTime &lt;= #{data.searchData.endDate} -- 小于等于
-            </if>
+            <if test="data.searchData.showOther != null and data.searchData.showOther == true">
+                <if test="data.searchData.startDate != null and data.searchData.startDate != ''">
+                    AND dTMCreateTime &gt;= #{data.searchData.startDate} -- 大于等于
+                </if>
+                <if test="data.searchData.endDate != null and data.searchData.endDate != ''">
+                    AND dTMUpdateTime &lt;= #{data.searchData.endDate} -- 小于等于
+                </if>
 
-            <if test="data.searchData.optionValue != null and data.searchData.optionValue != ''">
-                <if test="data.searchData.optionValue == '我的草稿'">
-                    AND cTMState = '草稿'
-                </if>
-                <if test="data.searchData.optionValue == '我的发布'">
-                    AND cTMState = '发布' AND cTMManagerCodes = #{data.cPICode}
+                <if test="data.searchData.optionValue != null and data.searchData.optionValue != ''">
+                    <if test="data.searchData.optionValue == '我的草稿'">
+                        AND cTMState = '草稿'
+                    </if>
+                    <if test="data.searchData.optionValue == '我的发布'">
+                        AND cTMState = '发布' AND cTMManagerCodes = #{data.cPICode}
+                    </if>
                 </if>
             </if>
         </if>
-        <if test="data.pageData.currentPage != null and data.pageData.currentPage != '' and data.pageData.pageSize != null and data.pageData.pageSize != ''">
-            limit #{data.pageData.pageSize} OFFSET #{data.pageData.offset}
+        order by iTMId desc
+        <if test="data.pageData != null and data.pageData != '' and data.pageData != null and data.pageData != ''">
+            <if test="data.pageData.currentPage != null and data.pageData.currentPage != '' and data.pageData.pageSize != null and data.pageData.pageSize != ''">
+                limit #{data.pageData.pageSize} OFFSET #{data.pageData.offset}
+            </if>
         </if>
     </select>
     <select id="getInfoListAmount" resultType="java.lang.Integer">
         select count(*) from taskmanager
         where dataState = '0'
-        <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
-            AND (cTMPubName like CONCAT('%', #{data.searchData.searchInput}, '%')
-            OR cTMTitle like CONCAT('%', #{data.searchData.searchInput}, '%')
-            )
-        </if>
-        <if test="data.searchData.showOther != null and data.searchData.showOther == true">
-            <if test="data.searchData.startDate != null and data.searchData.startDate != ''">
-                AND dTMCreateTime &gt;= #{data.searchData.startDate} -- 大于等于
+        <if test="data.searchData != null and data.searchData != ''">
+            <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
+                AND (cTMPubName like CONCAT('%', #{data.searchData.searchInput}, '%')
+                OR cTMTitle like CONCAT('%', #{data.searchData.searchInput}, '%')
+                )
             </if>
-            <if test="data.searchData.endDate != null and data.searchData.endDate != ''">
-                AND dTMUpdateTime &lt;= #{data.searchData.endDate} -- 小于等于
-            </if>
-
-            <if test="data.searchData.optionValue != null and data.searchData.optionValue != ''">
-                <if test="data.searchData.optionValue == '我的草稿'">
-                    AND cTMState = '草稿'
+            <if test="data.searchData.showOther != null and data.searchData.showOther == true">
+                <if test="data.searchData.startDate != null and data.searchData.startDate != ''">
+                    AND dTMCreateTime &gt;= #{data.searchData.startDate} -- 大于等于
                 </if>
-                <if test="data.searchData.optionValue == '我的发布'">
-                    AND cTMState = '发布' AND cTMManagerCodes = #{data.cPICode}
+                <if test="data.searchData.endDate != null and data.searchData.endDate != ''">
+                    AND dTMUpdateTime &lt;= #{data.searchData.endDate} -- 小于等于
+                </if>
+
+                <if test="data.searchData.optionValue != null and data.searchData.optionValue != ''">
+                    <if test="data.searchData.optionValue == '我的草稿'">
+                        AND cTMState = '草稿'
+                    </if>
+                    <if test="data.searchData.optionValue == '我的发布'">
+                        AND cTMState = '发布' AND cTMManagerCodes = #{data.cPICode}
+                    </if>
                 </if>
             </if>
         </if>

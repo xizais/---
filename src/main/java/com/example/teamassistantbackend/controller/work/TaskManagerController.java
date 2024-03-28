@@ -39,4 +39,31 @@ public class TaskManagerController {
     public BaseResponse<JSONObject> getTaskInfoList(@RequestBody JSONObject request){
         return ResultUtils.success(taskmanagerService.getInfoList(request));
     }
+
+    /**
+     * 获取任务列表
+     */
+    @PostMapping("/getTaskInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> getTaskInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(taskmanagerService.getTaskInfo(request));
+    }
+
+    /**
+     * 删除任务
+     */
+    @PostMapping("/deleteTask")
+    @ResponseBody
+    public BaseResponse<JSONObject> deleteTask(@RequestBody JSONObject request){
+        return ResultUtils.success(taskmanagerService.deleteTask(request));
+    }
+
+    /**
+     * 发布任务
+     */
+    @PostMapping("/pubTask")
+    @ResponseBody
+    public BaseResponse<JSONObject> pubTask(@RequestBody JSONObject request){
+        return ResultUtils.success(taskmanagerService.pubTask(request));
+    }
 }

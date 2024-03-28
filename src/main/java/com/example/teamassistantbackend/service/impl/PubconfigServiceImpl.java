@@ -276,14 +276,14 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         if (!isNotify && request.get("dPubEndTime") == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择发布停止时间！");
         }
-//        // 发布时间小于结束时间 --》 去掉：原因默认立即发布
-//        if (request.getTimestamp("dPubEndTime").before(request.getTimestamp("dPubStartTime"))) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应小于停止时间！");
-//        }
-        // 发布时间大于当前时间
-        if (!isNotify && request.getTimestamp("dPubStartTime").before(new Date())) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应大于当前时间！");
+        if (request.getTimestamp("dPubEndTime").before(request.getTimestamp("dPubStartTime"))) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应小于停止时间！");
         }
+//        // 发布时间小于结束时间 --》 去掉：原因默认立即发布
+//        // 发布时间大于当前时间
+//        if (!isNotify && request.getTimestamp("dPubStartTime").before(new Date())) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应大于当前时间！");
+//        }
         String tableName = "";
         String condition = "";
         // 如果已经发布，则不允许进行保存

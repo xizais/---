@@ -14,4 +14,10 @@ public interface TaskmanagerService extends IService<Taskmanager> {
     JSONObject saveTaskInfo(JSONObject request);
 
     JSONObject getInfoList(JSONObject request);
+
+    JSONObject getTaskInfo(JSONObject request);
+
+    JSONObject deleteTask(JSONObject request);
+
+    JSONObject pubTask(JSONObject request);
 }
