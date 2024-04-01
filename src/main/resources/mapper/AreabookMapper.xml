@@ -23,7 +23,7 @@
         cABState,dABCreateTime,dABUpdateTime,
         dataState
     </sql>
-    <select id="selectInfo">
+    <select id="selectInfo"  resultType="java.lang.Integer">
         select
             DATE_FORMAT(dABBookStartTime, '%Y-%m-%d %H:%i:%s') as dABBookStartTime,
             DATE_FORMAT(dABBookEndTime, '%Y-%m-%d %H:%i:%s') as dABBookEndTime,
@@ -54,6 +54,7 @@
         from areaBook
         WHERE
             dataState = '0'
+            and iAB_iAIId = #{data.iAIId}
             and (cABState = '已通过' or cABState = '待审批')
             and ((dABBookStartTime  &lt;= #{data.dABBookStartTime} and dABBookEndTime &gt;= #{data.dABBookStartTime})
             or (dABBookStartTime  &lt;= #{data.dABBookEndTime} and dABBookEndTime &gt;= #{data.dABBookEndTime})

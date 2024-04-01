@@ -21,7 +21,7 @@ public interface AreabookMapper extends BaseMapper<Areabook> {
 
     List<JSONObject> getInfoList(String code);
 
-    JSONObject selectInfo(Integer iABId);
+    JSONObject selectInfo(int iABId);
 }
 
 

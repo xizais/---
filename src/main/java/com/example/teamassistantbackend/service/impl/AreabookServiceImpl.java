@@ -108,8 +108,7 @@ public class AreabookServiceImpl extends ServiceImpl<AreabookMapper, Areabook>
         if (request == null || request.get("iABId") == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        JSONObject result = areabookMapper.selectInfo(request.getInteger("iABId"));
-        return result;
+        return areabookMapper.selectInfo(request.getInteger("iABId"));
     }
 }
 
