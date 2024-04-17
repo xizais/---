@@ -54,7 +54,12 @@
             and iTypeId = #{data.iTypeId}
     </select>
     <select id="getPersonsList" resultType="com.alibaba.fastjson.JSONObject">
-        select cPICode personId,cPIName personName,'暂定' as personBelong from PersonInfo where bPIIsEnabled = 1
+        select distinct cPICode personId,cPIName personName,'暂定' as personBelong from PersonInfo pi
+            left join orgpersonlink ol on ol.cOPL_cPICode = pi.cPICode
+            where 1 = 1
+        <if test="data.sys == null">
+            and ol.cOPL_cOICode in (select cOPL_cOICode from orgpersonlink where cOPL_cPICode = #{data.code})
+        </if>
     </select>
     <select id="checkDataIsPub" resultType="java.lang.Boolean">
         select count(*) from ${name} where dataState = '0' ${condition}

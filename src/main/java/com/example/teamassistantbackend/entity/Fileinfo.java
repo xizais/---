@@ -18,8 +18,8 @@ public class Fileinfo implements Serializable {
     /**
      * 文件编码
      */
-    @TableId
-    private String cFICode;
+    @TableId(type = IdType.AUTO)
+    private int iFICode;
 
     /**
      * 文件名

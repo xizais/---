@@ -62,7 +62,7 @@
         select id,
                 code,
                 name,
-                org,
+                '暂定' org,
                 CASE cState
                    WHEN 0 THEN '未完成'
                    WHEN 1 THEN '已完成'

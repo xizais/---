@@ -34,6 +34,7 @@
             cTMState,cTMCreaterCode,cTMUpdaterCode
         from taskmanager
         where dataState = '0'
+          and cTMUpdaterCode = #{data.cPICode}
         <if test="data.searchData != null and data.searchData != ''">
             <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
                 AND (cTMPubName like CONCAT('%', #{data.searchData.searchInput}, '%')
@@ -68,6 +69,7 @@
     <select id="getInfoListAmount" resultType="java.lang.Integer">
         select count(*) from taskmanager
         where dataState = '0'
+        and cTMUpdaterCode = #{data.cPICode}
         <if test="data.searchData != null and data.searchData != ''">
             <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
                 AND (cTMPubName like CONCAT('%', #{data.searchData.searchInput}, '%')

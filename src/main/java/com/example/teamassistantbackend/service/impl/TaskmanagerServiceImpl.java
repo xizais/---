@@ -1,14 +1,17 @@
 package com.example.teamassistantbackend.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.teamassistantbackend.common.ErrorCode;
+import com.example.teamassistantbackend.entity.Organizationinfo;
 import com.example.teamassistantbackend.entity.Pubconfig;
 import com.example.teamassistantbackend.entity.Taskmanager;
 import com.example.teamassistantbackend.entity.Worktask;
 import com.example.teamassistantbackend.exception.BusinessException;
 import com.example.teamassistantbackend.mapper.TaskmanagerMapper;
 import com.example.teamassistantbackend.service.*;
+import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +38,9 @@ public class TaskmanagerServiceImpl extends ServiceImpl<TaskmanagerMapper, Taskm
     OrganizationinfoService organizationinfoService;
     @Resource
     WorktaskService worktaskService;
+    @Resource
+    FileinfoService fileinfoService;
+
     @Override
     public JSONObject saveTaskInfo(JSONObject request) {
         if (request == null) {
@@ -72,6 +78,16 @@ public class TaskmanagerServiceImpl extends ServiceImpl<TaskmanagerMapper, Taskm
         } else {
             taskmanagerMapper.insert(taskmanager);
         }
+
+        // 处理文件信息
+        if (request.get("fileIds") != null && StringUtils.isNotEmpty(request.getString("fileIds"))) {
+            JSONObject handleInfo = new JSONObject();
+            handleInfo.put("type","task");
+            handleInfo.put("typeId",taskmanager.getITMId());
+            handleInfo.put("fileIds",request.getString("fileIds"));
+            fileinfoService.handleFile(handleInfo);
+        }
+
         JSONObject result = new JSONObject();
         result.put("message","操作成功!");
         return result;
@@ -97,14 +113,40 @@ public class TaskmanagerServiceImpl extends ServiceImpl<TaskmanagerMapper, Taskm
         if (request == null || request.get("iTMId") == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Taskmanager taskmanager = taskmanagerMapper.selectById(request.getInteger("iTMId"));
+        int iTMId = request.getInteger("iTMId");
+        JSONObject result = new JSONObject();
+        if ("approval".equals(request.getString("state")) || "approvalView".equals(request.getString("state"))) {
+            iTMId = worktaskService.getById(iTMId).getTypeid();
+        }
+        Taskmanager taskmanager = taskmanagerMapper.selectById(iTMId);
         if (taskmanager == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        JSONObject result = new JSONObject();
+        // 获取文件资源
+        JSONObject fileInfo = new JSONObject();
+        fileInfo.put("type","task");
+        fileInfo.put("typeId",iTMId);
+        List<JSONObject> fileList = fileinfoService.getFileInfoList(fileInfo);
+
+        List<JSONObject> fileListDo = new ArrayList<>();
+        // 获取任务完成文件信息
+        if (request.get("workTaskId") != null) {
+            int workTaskId = request.getInteger("workTaskId");
+            if ("approval".equals(request.getString("state")) || "approvalView".equals(request.getString("state"))) {
+                // 封装审批结果
+                result.put("approvalDescription",worktaskService.getById(workTaskId).getContent());
+                workTaskId = worktaskService.getById(workTaskId).getTypeid(); // 更新为目标工作待办
+            }
+            fileInfo.put("type","doTask");
+            fileInfo.put("typeId",workTaskId);
+            fileListDo = fileinfoService.getFileInfoList(fileInfo);
+        }
+
         result.put("cTMTitle",taskmanager.getCTMTitle());
         result.put("cTMContent",taskmanager.getCTMContent());
         result.put("cTMRequest",taskmanager.getCTMRequest());
+        result.put("fileList",fileList);
+        result.put("fileListDo",fileListDo);
         return result;
     }
 
@@ -168,6 +210,124 @@ public class TaskmanagerServiceImpl extends ServiceImpl<TaskmanagerMapper, Taskm
 
         JSONObject result = new JSONObject();
         result.put("message","发布成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject handleTask(JSONObject request) {
+        if (request == null || request.get("iTMId") == null || request.get("workTaskId") == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        // 获取个人信息
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+
+        // 处理任务
+        // 获取工作任务信息
+        Worktask worktask = worktaskService.getById(request.getInteger("workTaskId"));
+        if (worktask == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        worktask.setState("完成");
+        worktask.setUpdatetime(new Date());
+        worktaskService.updateById(worktask);
+        // 判断是否需要审批(根据发布配置进行判断0
+        Pubconfig pubconfig = pubconfigService.getPubConfigByData("Task",worktask.getTypeid());
+        if (pubconfig == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if ("true".equals(pubconfig.getCIsApproval())) {
+            // 增加一条审批待办
+            Taskmanager taskmanager = taskmanagerMapper.selectById(worktask.getTypeid());
+            boolean isDefaultHandle = true; // 是否默认处理
+            String handler = null;
+            // 判断是否启用组织审批管理
+            if ("true".equals(pubconfig.getCIsOrgManger())) {
+                // 默认查找对应的发布组织，所属组织存在则由部门组织进行审核，否则由该任务的负责人进行审核
+                // 查询当前人员所属的组织
+                List<String> orgCodesByPubConfig = organizationinfoService.getOrgCodesByPubConfig(pubconfig);
+                if (!orgCodesByPubConfig.isEmpty()) {
+                    String orgCode = organizationinfoService.selectPersonExitOrgs(curUserInfo.getString("code"), String.join(",", orgCodesByPubConfig));
+                    if (StringUtils.isNotEmpty(orgCode)) {
+                        // 获取组织负责人
+                        JSONObject orgManageInfo = organizationinfoService.getOrgManager(orgCode);
+                        // 增加工作待办数据
+                        handler = orgManageInfo.getString("code");
+                        // 修改处理方式
+                        isDefaultHandle = false;
+                    }
+                }
+            }
+            if (isDefaultHandle) {
+                // 默认任务创建人员进行管理
+                handler = taskmanager.getCTMManagerCodes().split(",")[0]; // 默认取第一个负责人
+            }
+            Worktask workTaskApproval = new Worktask();
+            workTaskApproval.setType("TaskApproval");
+            workTaskApproval.setTypeid(worktask.getId());// 对应工作任务ID
+            workTaskApproval.setCode(handler);
+            workTaskApproval.setUpdatetime(new Date());
+            workTaskApproval.setContent(curUserInfo.getString("name") + "已完成《"+taskmanager.getCTMTitle()+"》任务，请处理审批！");
+            worktaskService.save(workTaskApproval);
+        }
+
+        // 处理文件信息
+        if (request.get("fileDoIds") != null && StringUtils.isNotEmpty(request.getString("fileDoIds"))) {
+            JSONObject handleInfo = new JSONObject();
+            handleInfo.put("type","doTask");
+            handleInfo.put("typeId",worktask.getTypeid());
+            handleInfo.put("fileIds",request.getString("fileDoIds"));
+            fileinfoService.handleFile(handleInfo);
+
+            // 修改文件的关联表ID为工作待办ID
+            fileinfoService.updateFileManagerTypeId(request.getString("fileDoIds"),worktask.getId());
+        }
+
+        JSONObject result = new JSONObject();
+        result.put("message","操作成功！");
+        return result;
+    }
+
+    @Override
+    public JSONObject approvalTask(JSONObject request) {
+        if (request == null
+                || request.get("isPass") == null
+                || request.get("iTMId") == null
+                || request.get("workTaskId") == null
+        ) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 查询当前工作待办数据
+        JSONObject curUserInfo = personinfoService.getCurUserInfo();
+        int iTMId = request.getInteger("iTMId");
+        int workTaskId = request.getInteger("workTaskId");
+        boolean isPass = request.getBoolean("isPass");
+        Worktask curWorkTask = worktaskService.getById(workTaskId);
+        Worktask targetWorkTask = worktaskService.getById(iTMId);
+        if (isPass) {
+            targetWorkTask.setUpdatetime(new Date());
+            targetWorkTask.setContent(targetWorkTask.getContent() + curUserInfo.getString("name")+"已审批通过！");
+            worktaskService.updateById(targetWorkTask);
+        } else {
+            Taskmanager taskmanager = taskmanagerMapper.selectById(targetWorkTask.getTypeid());
+            // 增加一条新的待办
+            Worktask worktask = new Worktask();
+            worktask.setType(targetWorkTask.getType());
+            worktask.setTypeid(targetWorkTask.getTypeid());
+            worktask.setCode(targetWorkTask.getCode());
+            worktask.setUpdatetime(new Date());
+            worktask.setContent("任务《"+taskmanager.getCTMTitle()+"》审批不通过，理由如下："+request.getString("approvalDescription"));
+            worktaskService.save(worktask);
+
+        }
+        // 更新当前的任务
+        curWorkTask.setState("完成");
+        curWorkTask.setUpdatetime(new Date());
+        curWorkTask.setContent(curWorkTask.getContent() + " 审批结果：" + (isPass?"审批通过":"审批不通过") + "，理由如下：" + request.getString("approvalDescription"));
+        worktaskService.updateById(curWorkTask);
+
+        JSONObject result= new JSONObject();
+        result.put("message","审批成功！");
         return result;
     }
 }

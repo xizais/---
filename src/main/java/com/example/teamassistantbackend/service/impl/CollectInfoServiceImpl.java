@@ -276,6 +276,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             worktask.setTypeid(request.getInteger("iTypeId"));
             worktask.setCode(personInfo.getString("code"));
             worktask.setUpdatetime(new Date());
+            worktask.setContent(pubconfig.getCPuber() + "发布了《" + infoform.getCIFTitle() + "》信息收集表单，请尽快完成！");
             worktaskList.add(worktask);
         }
         worktaskService.saveBatch(worktaskList);
@@ -289,8 +290,19 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         if (request==null || request.get("id") == null || request.get("iIFId") == null)
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         String tableName = getDataTableName(request.getInteger("iIFId"));
+        JSONObject jsonObject = infoformcreateMapper.selectFromDataOne(tableName, request.getInteger("id"));
         String deleteSql = "update "+tableName+" set dataState = 1 where id = "+request.getInteger("id");
         infoformcreateMapper.doExcuSql(deleteSql);
+
+        // 删除工作待办
+        QueryWrapper<Worktask> worktaskQueryWrapper = new QueryWrapper<>();
+        worktaskQueryWrapper.eq("type","CollectInfo");
+        worktaskQueryWrapper.eq("code",jsonObject.getString("code"));
+        worktaskQueryWrapper.eq("typeId",request.getInteger("iIFId"));
+        worktaskQueryWrapper.eq("dataState","0");
+        Worktask tarWorkTask = worktaskService.getOne(worktaskQueryWrapper);
+        tarWorkTask.setDatastate("1");
+        worktaskService.updateById(tarWorkTask);
         JSONObject result = new JSONObject();
         result.put("message","删除成功！");
         return result;
@@ -302,6 +314,13 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         List<JSONObject> fromData = infoformcreateMapper.getFromDataListByTableName(getDataTableName(request.getInteger("iIFId")));
+        for (JSONObject data : fromData) {
+            Worktask worktask = worktaskService.getTopOneData(data.getString("code"),request.getInteger("iIFId"),"CollectInfo");
+            if (worktask == null) {
+                continue;
+            }
+            data.put("workTaskId",worktask.getId());
+        }
         JSONObject result = new JSONObject();
         result.put("fromData",fromData);
         return result;
@@ -376,6 +395,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         JSONArray orgs = request.getJSONArray("orgArray");
         // 插入数据
         insertFromDataPerson(request.getInteger("iIFId"),codes,names,orgs);
+
         JSONObject result = new JSONObject();
         result.put("message","操作成功！");
         return result;
@@ -651,6 +671,7 @@ public class CollectInfoServiceImpl implements CollectInfoService {
     private void insertFromDataPerson(Integer iIFId, JSONArray codes, JSONArray names, JSONArray orgs) {
         // 查看是否是发布中
         Infoform infoform = infoformMapper.selectById(iIFId);
+        Pubconfig pubconfig = pubconfigService.getPubConfigByData("CollectInfo",iIFId);
         String tableName = getDataTableName(iIFId);
         if (infoform == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -675,6 +696,15 @@ public class CollectInfoServiceImpl implements CollectInfoService {
             insertSql += ") ";
             infoformcreateMapper.doExcuSql(insertSql);
             insertSql = tempSql;
+
+            // 添加工作待办
+            Worktask worktask = new Worktask();
+            worktask.setType("CollectInfo");
+            worktask.setTypeid(iIFId);
+            worktask.setCode((String)codes.get(i));
+            worktask.setUpdatetime(new Date());
+            worktask.setContent(pubconfig.getCPuber() + "发布了《" + infoform.getCIFTitle() + "》信息收集表单，请尽管完成！");
+            worktaskService.save(worktask);
         }
     }
 

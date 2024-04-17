@@ -43,5 +43,6 @@
         select count(*) from worktask
         where type = 'Notify'
         and state = '已确认'
+        and typeId = #{data.typeId}
     </select>
 </mapper>

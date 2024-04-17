@@ -1,8 +1,13 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Fileinfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.List;
 
 /**
 * @author huang
@@ -13,6 +18,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface FileinfoMapper extends BaseMapper<Fileinfo> {
 
+    JSONObject getFileInfo(int fileId);
+
+    List<JSONObject> getFileInfoList(String fileIds);
+
+    List<JSONObject> getTableFileList(@Param(value = "data") JSONObject fileInfo);
 }
 
 

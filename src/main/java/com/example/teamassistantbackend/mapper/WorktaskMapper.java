@@ -18,6 +18,8 @@ public interface WorktaskMapper extends BaseMapper<Worktask> {
     List<JSONObject> getWorkInfoList(@Param("code") String code,@Param("data") JSONObject request);
 
     int getWorkInfoListMount(@Param("code") String code,@Param("data") JSONObject request);
+
+    Worktask getTopOneData(@Param(value = "code") String code,@Param(value = "typeId") Integer typeId,@Param(value = "type") String type);
 }
 
 

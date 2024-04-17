@@ -18,4 +18,12 @@ public interface PersoninfoService extends IService<Personinfo> {
     JSONObject getCurUserInfo();//获取当前用户信息
 
     String getPersonName(String code);// 通过人员编码获取人员名称
+
+    JSONObject getCurPerInfo(); // 返回当前用户信息
+
+    JSONObject getAllPerInfo(); // 获取系统所有用户信息
+
+    JSONObject deletePerInfo(JSONObject request); // 删除用户信息
+
+    void checkAuth(); // 鉴权
 }

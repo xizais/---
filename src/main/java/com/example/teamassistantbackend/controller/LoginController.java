@@ -36,4 +36,28 @@ public class LoginController {
         personinfoService.logout();
         return ResultUtils.success("操作成功！");
     }
+
+    @PostMapping("/getCurPerInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> getCurPerInfo(){
+        return ResultUtils.success(personinfoService.getCurPerInfo());
+    }
+
+    /**
+     * 获取系统所有用户信息
+     */
+    @PostMapping("/getAllPerInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> getAllPerInfo(){
+        return ResultUtils.success(personinfoService.getAllPerInfo());
+    }
+
+    /**
+     * 删除用户信息
+     */
+    @PostMapping("/deletePerInfo")
+    @ResponseBody
+    public BaseResponse<JSONObject> deletePerInfo(@RequestBody JSONObject request){
+        return ResultUtils.success(personinfoService.deletePerInfo(request));
+    }
 }

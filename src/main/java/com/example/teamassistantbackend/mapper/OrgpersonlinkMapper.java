@@ -20,6 +20,12 @@ public interface OrgpersonlinkMapper extends BaseMapper<Orgpersonlink> {
     List<String> getPersonCodeByOrgCode(String orgCodes);
 
     List<JSONObject> selectPersonByPersonCodeAndOrgCodes(@Param("personCode") String personCode,@Param("orgs") String orgs);
+
+    List<JSONObject> getPersonTableInfoList(String cOICode);
+
+    List<JSONObject> getChildOrgList(String cOICode);
+
+    void updateOrgLinkInfo(@Param(value = "orgpersonlink") Orgpersonlink orgpersonlink);
 }
 
 

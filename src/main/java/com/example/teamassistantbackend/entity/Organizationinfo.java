@@ -101,6 +101,16 @@ public class Organizationinfo implements Serializable {
      */
     private Boolean bOIIsPublicOrgFile;
 
+    /**
+     * 是否启用组织
+     */
+    private Boolean bOIIsEnable;
+
+    /**
+     * 数据状态（0：活动；1：删除）
+     */
+    private String dataState;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

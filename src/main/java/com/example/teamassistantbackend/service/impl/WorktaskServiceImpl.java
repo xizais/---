@@ -68,7 +68,7 @@ public class WorktaskServiceImpl extends ServiceImpl<WorktaskMapper, Worktask>
 
                 result.put("message","审批成功！");
                 worktask.setUpdatetime(new Date());
-                worktask.setContent(request.getString("approvalCotent"));
+                worktask.setContent("此信息收集任务审批处理"+request.getString("approvalResult")+",审批描述："+request.getString("approvalCotent"));
                 worktask.setState(request.getString("approvalResult"));
                 worktaskMapper.updateById(worktask);
 
@@ -95,7 +95,7 @@ public class WorktaskServiceImpl extends ServiceImpl<WorktaskMapper, Worktask>
                     worktaskNew.setTypeid(request.getInteger("typeId"));
                     worktaskNew.setCode(worktask.getCode());
                     worktaskNew.setUpdatetime(new Date());
-                    worktaskNew.setContent("审批未通过，请重新完成"+request.getString("title")+"收集表单的填写！");
+                    worktaskNew.setContent("审批未通过，请重新完成"+request.getString("title")+"收集表单的填写！\n审批描述："+request.getString("approvalCotent"));
                     worktaskMapper.insert(worktaskNew);
                 }
 
@@ -163,6 +163,11 @@ public class WorktaskServiceImpl extends ServiceImpl<WorktaskMapper, Worktask>
         if (!worktasks.isEmpty()) {
             this.updateBatchById(worktasks);
         }
+    }
+
+    @Override
+    public Worktask getTopOneData(String code, Integer typeId, String type) {
+        return worktaskMapper.getTopOneData(code,typeId,type);
     }
 
     private void updateState(Integer typeId, Integer id, boolean approvalResult) {

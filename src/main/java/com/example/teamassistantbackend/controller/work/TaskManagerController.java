@@ -41,7 +41,7 @@ public class TaskManagerController {
     }
 
     /**
-     * 获取任务列表
+     * 获取任务信息
      */
     @PostMapping("/getTaskInfo")
     @ResponseBody
@@ -65,5 +65,23 @@ public class TaskManagerController {
     @ResponseBody
     public BaseResponse<JSONObject> pubTask(@RequestBody JSONObject request){
         return ResultUtils.success(taskmanagerService.pubTask(request));
+    }
+
+    /**
+     * 个人任务处理
+     */
+    @PostMapping("/doneTask")
+    @ResponseBody
+    public BaseResponse<JSONObject> doneTask(@RequestBody JSONObject request){
+        return ResultUtils.success(taskmanagerService.handleTask(request));
+    }
+
+    /**
+     * 个人任务审批
+     */
+    @PostMapping("/approvalTask")
+    @ResponseBody
+    public BaseResponse<JSONObject> approvalTask(@RequestBody JSONObject request){
+        return ResultUtils.success(taskmanagerService.approvalTask(request));
     }
 }

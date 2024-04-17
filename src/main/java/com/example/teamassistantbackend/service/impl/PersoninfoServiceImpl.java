@@ -12,6 +12,7 @@ import com.example.teamassistantbackend.mapper.PersoninfoMapper;
 import com.example.teamassistantbackend.utils.StringUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -35,6 +36,8 @@ public class PersoninfoServiceImpl extends ServiceImpl<PersoninfoMapper, Personi
 
     @Resource
     PersoninfoMapper personinfoMapper;
+    @Value("${Variable.sysManager}")
+    private String sysManager;
     @Override
     public JSONObject userLogin(String code, String password, HttpServletRequest request) {
         // 1. 判空
@@ -98,6 +101,43 @@ public class PersoninfoServiceImpl extends ServiceImpl<PersoninfoMapper, Personi
             return null;
         }
         return personinfos.get(0).getCPIName();
+    }
+
+    @Override
+    public JSONObject getCurPerInfo() {
+        return getCurUserInfo();
+    }
+
+    @Override
+    public JSONObject getAllPerInfo() {
+        // 鉴权
+        checkAuth();
+
+        List<JSONObject> perList = personinfoMapper.getAllPerInfoList();
+        JSONObject result = new JSONObject();
+        result.put("perList",perList);
+        return result;
+    }
+
+    @Override
+    public JSONObject deletePerInfo(JSONObject request) {
+        // 鉴权
+        checkAuth();
+        // 查询用户信息
+        personinfoMapper.deleteById(request.getString("perCode"));
+        JSONObject result = new JSONObject();
+        result.put("message","删除成功！");
+        return result;
+    }
+
+
+    // 鉴权
+    @Override
+    public void checkAuth() {
+        // 获取用户信息
+        if (!getCurPerInfo().getString("code").equals(sysManager)) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"非系统管理员无权操作！");
+        }
     }
 
 }

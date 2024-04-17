@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.teamassistantbackend.common.ErrorCode;
@@ -14,6 +15,7 @@ import com.example.teamassistantbackend.mapper.NoticemanagerMapper;
 import com.example.teamassistantbackend.service.*;
 import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -36,8 +38,11 @@ public class NoticemanagerServiceImpl extends ServiceImpl<NoticemanagerMapper, N
     OrganizationinfoService organizationinfoService;
     @Resource
     WorktaskService worktaskService;
+    @Resource
+    FileinfoService fileinfoService;
 
     @Override
+    @Transactional
     public JSONObject saveNoticeInfo(JSONObject request) {
         if (request == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -70,6 +75,15 @@ public class NoticemanagerServiceImpl extends ServiceImpl<NoticemanagerMapper, N
         } else {
             noticemanagerMapper.updateById(noticemanager);
         }
+        // 文件处理
+        if (request.get("fileIds") != null && StringUtils.isNotEmpty(request.getString("fileIds"))) {
+            JSONObject handleInfo = new JSONObject();
+            handleInfo.put("type","notify");
+            handleInfo.put("typeId",noticemanager.getINMId());
+            handleInfo.put("fileIds",request.getString("fileIds"));
+            fileinfoService.handleFile(handleInfo);
+        }
+
         JSONObject result = new JSONObject();
         result.put("message","保存成功!");
         result.put("iNMId",noticemanager.getINMId());
@@ -111,8 +125,14 @@ public class NoticemanagerServiceImpl extends ServiceImpl<NoticemanagerMapper, N
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         Noticemanager noticemanager = noticemanagerMapper.selectById(request.getInteger("iNMId"));
+        // 获取文件信息
+        JSONObject fileInfo = new JSONObject();
+        fileInfo.put("type","notify");
+        fileInfo.put("typeId",request.getString("iNMId"));
+        List<JSONObject> fileList = fileinfoService.getFileInfoList(fileInfo);
         JSONObject result = new JSONObject();
         result.put("info",noticemanager);
+        result.put("fileList",fileList);
         return result;
     }
 

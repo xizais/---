@@ -19,5 +19,9 @@ public interface TaskmanagerService extends IService<Taskmanager> {
 
     JSONObject deleteTask(JSONObject request);
 
-    JSONObject pubTask(JSONObject request);
+    JSONObject pubTask(JSONObject request); // 发布任务
+
+    JSONObject handleTask(JSONObject request); // 处理个人任务信息
+
+    JSONObject approvalTask(JSONObject request); // 审批个人任务
 }

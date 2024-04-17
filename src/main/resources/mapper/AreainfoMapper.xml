@@ -27,10 +27,33 @@
     </sql>
     <select id="getInfoList" resultType="com.alibaba.fastjson.JSONObject">
         select ai.* from areainfo ai
-                 where ai.dataState = '0'
+        where ai.dataState = '0'
         <if test="data.ids != null and data.ids != ''">
             and ai.iAIId not in (#{data.ids})
         </if>
+        <if test="data.searchData != null and data.searchData != ''">
+            <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
+                and (
+                    cAIName like CONCAT('%', #{data.searchData.searchInput}, '%')
+                    or cAIContent like CONCAT('%', #{data.searchData.searchInput}, '%')
+                    or cAIManagerName like CONCAT('%', #{data.searchData.searchInput}, '%')
+                )
+            </if>
+            <if test="data.searchData.showOther">
+                and ai.iAIId not in (
+                    select iAB_iAIId from areabook ab where dataState = '0'
+                     and (
+                        (ab.dABBookStartTime &lt;= #{data.searchData.startDate} and ab.dABBookEndTime &gt;= #{data.searchData.startDate})
+                        or (ab.dABBookStartTime &lt;= #{data.searchData.endDate} and ab.dABBookEndTime &gt;= #{data.searchData.endDate})
+                        or (ab.dABBookStartTime &gt;= #{data.searchData.startDate} and ab.dABBookStartTime &lt;= #{data.searchData.endDate})
+                        or (ab.dABBookEndTime &gt;= #{data.searchData.startDate} and ab.dABBookEndTime &lt;= #{data.searchData.endDate})
+                    )
+                )
+            </if>
+        </if>
+
+        order by dAIUpdateTime desc
+
         <if test="data.pageData != null and data.pageData != ''">
             limit #{data.pageData.pageSize} OFFSET #{data.pageData.offset}
         </if>
@@ -43,6 +66,26 @@
         where ai.dataState = '0'
         <if test="data.ids != null and data.ids != ''">
             and ai.iAIId not in (#{data.ids})
+        </if>
+        <if test="data.searchData != null and data.searchData != ''">
+            <if test="data.searchData.searchInput != null and data.searchData.searchInput != ''">
+                and (
+                cAIName like CONCAT('%', #{data.searchData.searchInput}, '%')
+                or cAIContent like CONCAT('%', #{data.searchData.searchInput}, '%')
+                or cAIManagerName like CONCAT('%', #{data.searchData.searchInput}, '%')
+                )
+            </if>
+            <if test="data.searchData.showOther">
+                and ai.iAIId not in (
+                select iAB_iAIId from areabook ab where dataState = '0'
+                and (
+                (ab.dABBookStartTime &lt;= #{data.searchData.startDate} and ab.dABBookEndTime &gt;= #{data.searchData.startDate})
+                or (ab.dABBookStartTime &lt;= #{data.searchData.endDate} and ab.dABBookEndTime &gt;= #{data.searchData.endDate})
+                or (ab.dABBookStartTime &gt;= #{data.searchData.startDate} and ab.dABBookStartTime &lt;= #{data.searchData.endDate})
+                or (ab.dABBookEndTime &gt;= #{data.searchData.startDate} and ab.dABBookEndTime &lt;= #{data.searchData.endDate})
+                )
+                )
+            </if>
         </if>
     </select>
 </mapper>

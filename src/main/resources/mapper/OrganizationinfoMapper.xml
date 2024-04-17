@@ -22,6 +22,8 @@
             <result property="cOIAssignPermPerm" column="cOIAssignPermPerm" jdbcType="VARCHAR"/>
             <result property="cOIManageFilePerm" column="cOIManageFilePerm" jdbcType="VARCHAR"/>
             <result property="bOIIsPublicOrgFile" column="bOIIsPublicOrgFile" jdbcType="BIT"/>
+            <result property="bOIIsEnable" column="bOIIsEnable" jdbcType="BIT"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -30,6 +32,41 @@
         iOISubLevelSequence,dOICreationTime,cOI_cPICode,
         cOIManagerCode,bOIIsUserVerified,cOIOrgManagementPerm,
         cOIAddUserPerm,cOIDeleteUserPerm,cOIAssignPermPerm,
-        cOIManageFilePerm,bOIIsPublicOrgFile
+        cOIManageFilePerm,bOIIsPublicOrgFile,bOIIsEnable,
+        dataState
     </sql>
+    <select id="getOrgList" resultType="com.alibaba.fastjson.JSONObject">
+        select * from organizationinfo
+        where dataState = '0'
+        <if test="perCode != null and perCode != ''">
+            and (
+                FIND_IN_SET(#{perCode}, cOIManagerCode) > 0
+                or organizationinfo.cOICode in (
+                    select cOPL_cOICode from orgpersonlink where cOPL_cPICode = #{perCode} and iOPLPersonStatus = 1
+                )
+            )
+        </if>
+        <if test="perCode == null or perCode == ''">
+            and bOIIsPublicVisible = 0
+        </if>
+    </select>
+    <select id="getManagerName" resultType="java.lang.String">
+        SELECT
+            GROUP_CONCAT( p.cPIName ) AS cPINames
+        FROM
+            personinfo p
+        WHERE
+            FIND_IN_SET( p.cPICode, #{orgManagerInfo} ) > 0
+    </select>
+    <select id="getMyPerArray" resultType="com.alibaba.fastjson.JSONObject">
+        select DISTINCT cPIName,cPICode from personinfo pi
+            left join orgpersonlink ol on ol.cOPL_cPICode = pi.cPICode
+            left join organizationinfo oi on oi.cOICode = ol.cOPL_cOICode
+        where bPIIsEnabled = 1
+        <if test="allData == null || allData == ''">
+            and (oi.cOIManagerCode = #{curPerCode}
+            or ol.cOPL_cPICode = #{curPerCode})
+            and pi.cPICode not in ( select cOPL_cPICode from orgpersonlink where cOPL_cOICode = #{curOrgCode}  and iOPLPersonStatus = 1)
+        </if>
+    </select>
 </mapper>

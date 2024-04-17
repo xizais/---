@@ -17,10 +17,46 @@
         cOPL_cOICode,cOPL_cPICode,dOPLCreationTime,
         cOPLCreatedBy,cOPLPermissionSet,iOPLPersonStatus
     </sql>
+    <update id="updateOrgLinkInfo">
+        UPDATE orgpersonlink
+        SET
+        cOPLCreatedBy = #{orgpersonlink.cOPLCreatedBy},
+        iOPLPersonStatus = #{orgpersonlink.iOPLPersonStatus}
+        WHERE cOPL_cOICode = #{orgpersonlink.cOPL_cOICode}
+           and cOPL_cPICode = #{orgpersonlink.cOPL_cPICode}
+    </update>
     <select id="getPersonCodeByOrgCode" resultType="java.lang.String">
         select distinct cOPL_cPICode from OrgPersonLink where cOPL_cOICode in (${orgCodes}) and iOPLPersonStatus = 1;
     </select>
     <select id="selectPersonByPersonCodeAndOrgCodes" resultType="com.alibaba.fastjson.JSONObject">
         select * from orgpersonlink where cOPL_cOICode in (#{orgs}) and cOPL_cPICode = #{personCode}
+    </select>
+    <select id="getPersonTableInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select cPIName,cPICode,cOIOrgName from personinfo pi
+            left join orgpersonlink ol on ol.cOPL_cPICode = pi.cPICode
+            left join organizationinfo oi  on oi.cOICode = ol.cOPL_cOICode
+        where bPIIsEnabled = 1
+        and cOPL_cOICode = #{cOICode}
+        and oi.dataState = '0'
+    </select>
+    <select id="getChildOrgList" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            cOICode,
+            cOIOrgCode,
+            cOIOrgName,
+            case bOIIsEnable
+                when 0 THEN '停用'
+                when 1 THEN '启用'
+            END AS bOIIsEnable ,
+
+            case bOIIsPublicVisible
+                when 0 THEN '否'
+                when 1 THEN '是'
+            END AS bOIIsPublicVisible,
+            cOIManagerCode
+        from organizationinfo
+        where dataState = '0'
+        and cOICode like CONCAT(#{cOICode}, '%')
+        and cOICode != #{cOICode}
     </select>
 </mapper>

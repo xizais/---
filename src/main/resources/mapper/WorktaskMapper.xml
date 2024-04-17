@@ -21,59 +21,94 @@
         content,dataState
     </sql>
     <select id="getWorkInfoList" resultType="com.alibaba.fastjson.JSONObject">
-        SELECT * FROM (
+        SELECT
+            *
+        FROM
+        (
             SELECT
                 id,
                 typeId,
-                DATE_FORMAT(updateTime, '%Y-%m-%d') AS updateTime,
+                DATE_FORMAT( updateTime, '%Y-%m-%d' ) AS updateTime,
                 state,
                 content,
                 cIFTitle AS title,
                 cIFPuber AS puber,
-                CASE type
-                    WHEN 'CollectInfo' THEN '信息收集'
-                    WHEN 'CollectInfoApproval' THEN '信息收集审批'
-                    WHEN 'Task' THEN '任务'
-                    WHEN 'TaskApproval' THEN '任务审批'
-                    WHEN 'Notify' THEN '通知'
-                END AS type
+                CASE
+                    type
+                    WHEN 'CollectInfo' THEN
+                    '信息收集'
+                    WHEN 'CollectInfoApproval' THEN
+                    '信息收集审批'
+                    WHEN 'Task' THEN
+                    '任务'
+                    WHEN 'TaskApproval' THEN
+                    '任务审批'
+                    WHEN 'Notify' THEN
+                    '通知'
+                    END AS type
             FROM
                 worktask wt
                 LEFT JOIN InfoForm info ON wt.typeId = info.iIFId
             WHERE
                 wt.dataState = '0'
-                AND code = #{code}
-                AND (type = 'CollectInfo' OR type = 'CollectInfoApproval')
-            ) AS subquery1
-
-        UNION
-
-        SELECT * FROM (
+                AND CODE = #{code}
+                AND ( type = 'CollectInfo' OR type = 'CollectInfoApproval' )
+                AND info.dataState = '0'
+        ) AS subquery1 UNION
+        SELECT
+        *
+        FROM
+        (
             SELECT
                 id,
                 typeId,
-                DATE_FORMAT(updateTime, '%Y-%m-%d') AS updateTime,
+                DATE_FORMAT( updateTime, '%Y-%m-%d' ) AS updateTime,
                 state,
                 content,
                 cTMTitle AS title,
                 cTMPubName AS puber,
-                CASE type
-                    WHEN 'Task' THEN '任务'
-                    WHEN 'TaskApproval' THEN '任务审批'
+                CASE
+                    type
+                    WHEN 'Task' THEN
+                    '任务'
                 END AS type
             FROM
                 worktask wt
                 LEFT JOIN taskManager tm ON wt.typeId = tm.iTMId
             WHERE
                 wt.dataState = '0'
-                AND code = #{code}
-                AND (type = 'Task' OR type = 'TaskApproval')
-        ) AS subquery2
-
-         union
-
+                AND CODE = #{code}
+                AND ( type = 'Task' )
+                AND tm.dataState = '0'
+        ) AS subquery2 UNION
         SELECT
-            *
+        *
+        FROM
+        (
+            SELECT
+                wt.id,
+                wt.typeId,
+                DATE_FORMAT( wt.updateTime, '%Y-%m-%d' ) AS updateTime,
+                wt.state,
+                wt.content,
+                cTMTitle AS title,
+                cTMPubName AS puber,
+                CASE
+                    wt.type
+                    WHEN 'TaskApproval' THEN
+                    '任务审批'
+                END AS type
+            FROM
+                worktask wt
+                LEFT JOIN worktask wt2 ON wt2.id = wt.typeId
+                LEFT JOIN taskManager tm ON wt2.typeId = tm.iTMId
+            WHERE
+                wt.dataState = '0'
+                AND wt.CODE = #{code}
+                AND ( wt.type = 'TaskApproval' )
+        ) AS subquery3 UNION
+        SELECT
+        *
         FROM
         (
             SELECT
@@ -88,7 +123,7 @@
                     type
                     WHEN 'Notify' THEN
                     '通知'
-                END AS type
+                    END AS type
             FROM
                 worktask wt
                 LEFT JOIN noticeManager nm ON wt.typeId = nm.iNMId
@@ -96,8 +131,10 @@
                 wt.dataState = '0'
                 AND CODE = #{code}
                 AND ( type = 'Notify' OR type = 'Notify' )
-        ) AS subquery3
-        ORDER BY id DESC
+                AND nm.dataState = '0'
+        ) AS subquery4
+        ORDER BY
+        id DESC
         <if test="data.selectPage.currentPage != null and data.selectPage.currentPage != '' and data.selectPage.pageSize != null and data.selectPage.pageSize != ''">
             limit #{data.selectPage.pageSize} OFFSET #{data.selectPage.offset}
         </if>
@@ -182,5 +219,15 @@
              ) AS subquery3
          ORDER BY id DESC
      ) amount
+    </select>
+    <select id="getTopOneData" resultType="com.example.teamassistantbackend.entity.Worktask">
+        select * from worktask
+        where
+            dataState = '0'
+            and type = #{type}
+            and typeid = #{typeId}
+            and code = #{code}
+        order by id desc
+        limit 1
     </select>
 </mapper>

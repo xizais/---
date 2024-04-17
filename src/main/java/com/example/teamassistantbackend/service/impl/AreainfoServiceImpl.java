@@ -106,11 +106,13 @@ public class AreainfoServiceImpl extends ServiceImpl<AreainfoMapper, Areainfo>
         if (request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        if (request.get("searchData") != null && request.get("searchData") !=null && request.getBoolean("searchData")) {
-            if (request.get("startDate") == null) {
+        if (request.get("searchData") != null
+                && request.getJSONObject("searchData").get("showOther")!=null
+                && request.getJSONObject("searchData").getBoolean("showOther")) {
+            if (request.getJSONObject("searchData").get("startDate") == null) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择预约开始时间！");
             }
-            if (request.get("endDate") == null) {
+            if (request.getJSONObject("searchData").get("endDate") == null) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择预约结束时间！！");
             }
         }

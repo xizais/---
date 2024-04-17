@@ -19,6 +19,7 @@ import com.example.teamassistantbackend.service.PubconfigService;
 import com.example.teamassistantbackend.entity.Pubconfig;
 import com.example.teamassistantbackend.mapper.PubconfigMapper;
 import com.example.teamassistantbackend.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,6 +43,8 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
     TaskmanagerMapper taskmanagerMapper;
     @Resource
     NoticemanagerMapper noticemanagerMapper;
+    @Value("${Variable.sysManager}")
+    private String sysManager;
 
     @Override
     public JSONObject savePubConfig(JSONObject request) {
@@ -162,6 +165,7 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         JSONObject curUserInfo = personinfoService.getCurUserInfo();
         JSONObject result = new JSONObject();
         // 查询人员信息
+        curUserInfo.put("sys",curUserInfo.getString("code").equals(sysManager)?"all":null);
         result.put("persons",pubconfigMapper.getPersonsList(curUserInfo));
         // 查询组织信息
 
@@ -276,7 +280,7 @@ public class PubconfigServiceImpl extends ServiceImpl<PubconfigMapper, Pubconfig
         if (!isNotify && request.get("dPubEndTime") == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"请选择发布停止时间！");
         }
-        if (request.getTimestamp("dPubEndTime").before(request.getTimestamp("dPubStartTime"))) {
+        if (!isNotify&&request.getTimestamp("dPubEndTime").before(request.getTimestamp("dPubStartTime"))) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"发布时间应小于停止时间！");
         }
 //        // 发布时间小于结束时间 --》 去掉：原因默认立即发布

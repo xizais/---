@@ -66,6 +66,7 @@
                 </if>
             </if>
         </if>
+        order by cIFUpdateTime desc
         <if test="data.currentPage != null and data.currentPage != '' and data.pageSize != null and data.pageSize != ''">
             limit #{data.pageSize} OFFSET #{data.offset}
         </if>

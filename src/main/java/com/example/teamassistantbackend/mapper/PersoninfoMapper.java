@@ -20,6 +20,8 @@ public interface PersoninfoMapper extends BaseMapper<Personinfo> {
     Personinfo getUserInfo(@Param(value = "userInfo") JSONObject userInfo);// 获取用户信息
 
     List<JSONObject> getUserCodeAndName(String personCodeList);
+
+    List<JSONObject> getAllPerInfoList(); // 获取所有用户信息
 }
 
 

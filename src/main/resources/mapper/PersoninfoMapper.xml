@@ -35,4 +35,18 @@
     <select id="getUserCodeAndName" resultType="com.alibaba.fastjson.JSONObject">
         select cPICode code, cPIName name from PersonInfo where bPIIsEnabled = 1 and cPICode in (${personCodeList})
     </select>
+    <select id="getAllPerInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            cPICode,
+            cPIName,
+            cPIGender,
+            cPIHometown,
+            cPIContactNumber,
+            cPIEmail,
+            case bPIIsEnabled when 0 then '禁用'
+                              when 1 then '启用'
+            end as bPIIsEnabled
+        from PersonInfo
+        order by dPICreateTime desc
+    </select>
 </mapper>

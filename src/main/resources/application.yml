@@ -47,3 +47,8 @@ knife4j:
   # 是否开启增强模式
   enable: true
   production: false # 业务开发时，更改为false，则启用接口文档（地址：http://localhost:8099/api/doc.html#/home）
+
+#系统变量
+Variable:
+    FilePath: D:/tempTestResource/teamAssistance/
+    sysManager: 201549221

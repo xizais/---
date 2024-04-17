@@ -18,4 +18,6 @@ public interface WorktaskService extends IService<Worktask> {
     JSONObject deleteWorkTask(JSONObject request);
 
     void deleteWorkTaskAll(String typeId, String type);
+
+    Worktask getTopOneData(String code, Integer typeId, String type);// 获取最新一条工作待办信息
 }

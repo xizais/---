@@ -5,7 +5,7 @@
 <mapper namespace="com.example.teamassistantbackend.mapper.FileinfoMapper">
 
     <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Fileinfo">
-            <id property="cFICode" column="cFICode" jdbcType="VARCHAR"/>
+            <id property="iFICode" column="iFICode" jdbcType="VARCHAR"/>
             <result property="cFIFileName" column="cFIFileName" jdbcType="VARCHAR"/>
             <result property="cFIMD5Code" column="cFIMD5Code" jdbcType="VARCHAR"/>
             <result property="cFIFilePath" column="cFIFilePath" jdbcType="VARCHAR"/>
@@ -17,8 +17,34 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        cFICode,cFIFileName,cFIMD5Code,
+        iFICode,cFIFileName,cFIMD5Code,
         cFIFilePath,dFICreateTime,cFI_cPICode,
         cFIDescription,iFIFileSize,cFIMimeType
     </sql>
+    <select id="getFileInfo" resultType="com.alibaba.fastjson.JSONObject">
+        select * from
+            filemanager fm
+            left join fileinfo fi on fi.iFICode = fm.iFM_iFICode
+        where
+            fm.dataState = 0
+            and fm.iFMId = #{fileId}
+    </select>
+    <select id="getFileInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select * from
+            filemanager fm
+                left join fileinfo fi on fi.iFICode = fm.iFM_iFICode
+        where
+            fm.dataState = 0
+          and fm.iFMId in (${fileIds})
+    </select>
+    <select id="getTableFileList" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            fi.cFIFileName fileName, fm.iFMId fileId
+        from filemanager fm
+            left join fileinfo fi on fi.iFICode = fm.iFM_iFICode
+        where
+            fm.dataState = 0
+          and cFMType = #{data.type}
+          and cFMTypeId = #{data.typeId}
+    </select>
 </mapper>

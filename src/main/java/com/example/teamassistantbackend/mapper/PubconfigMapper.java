@@ -17,7 +17,7 @@ public interface PubconfigMapper extends BaseMapper<Pubconfig> {
 
     JSONObject selectPubConfig(@Param(value = "data") JSONObject request);// 查询发布配置信息，根据关联表ID、类型
 
-    List<JSONObject> getPersonsList(JSONObject curUserInfo);
+    List<JSONObject> getPersonsList(@Param(value = "data")JSONObject curUserInfo);
 
     boolean checkDataIsPub(@Param(value = "condition") String condition,@Param(value = "name") String tableName);
 }
