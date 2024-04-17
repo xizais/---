@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.FilemanagerMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Filemanager">
+            <id property="iFMId" column="iFMId" jdbcType="INTEGER"/>
+            <result property="iFM_iFICode" column="iFM_iFICode" jdbcType="INTEGER"/>
+            <result property="cFMType" column="cFMType" jdbcType="VARCHAR"/>
+            <result property="cFMTypeId" column="cFMTypeId" jdbcType="VARCHAR"/>
+            <result property="cFMManagerCode" column="cFMManagerCode" jdbcType="VARCHAR"/>
+            <result property="dFMHandleTime" column="dFMHandleTime" jdbcType="TIMESTAMP"/>
+            <result property="cFMHandleCode" column="cFMHandleCode" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iFMId,iFM_iFICode,cFMType,
+        cFMTypeId,cFMManagerCode,dFMHandleTime,
+        cFMHandleCode,dataState
+    </sql>
+    <update id="updateTypeId">
+        update Filemanager set cFMTypeId = #{typeId} where iFMId in (${fileDoIds});
+    </update>
+</mapper>
