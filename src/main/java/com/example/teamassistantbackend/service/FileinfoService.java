@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -29,4 +30,7 @@ public interface FileinfoService extends IService<Fileinfo> {
     void updateFileManagerTypeId(String fileDoIds, Integer typeId); // 修改文件的关联表的ID为工作待办的ID
 
     JSONObject exportFile(MultipartFile fileInfo); // 导入人员信息
+
+    JSONObject handleTaskZipFile(int iTMId) throws Exception; // 处理任务完成文件并且将任务的文件进行压缩，以及返回文件路径
+    public void deleteFolder(File folder); // 删除文件夹
 }

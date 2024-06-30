@@ -147,6 +147,7 @@ public class OrganizationinfoServiceImpl extends ServiceImpl<OrganizationinfoMap
         JSONObject result = new JSONObject();
         result.put("message","查询成功！");
         result.put("orgList",orgList);
+        result.put("isSysManager",personinfoService.isSysManager());
         return result;
     }
 

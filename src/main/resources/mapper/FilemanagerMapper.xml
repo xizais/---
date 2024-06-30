@@ -23,4 +23,20 @@
     <update id="updateTypeId">
         update Filemanager set cFMTypeId = #{typeId} where iFMId in (${fileDoIds});
     </update>
+    <select id="getFileInfoList" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            distinct
+            fi.*
+        from Filemanager fm
+        left join fileinfo fi on fi.iFICode = fm.iFM_iFICode
+        where cFMType = #{type} and dataState = '0'
+        <if test="type == 'doTask'">
+            and cFMTypeId in (
+                select id from workTask where typeId = #{typeId} and type = 'Task' and dataState = '0'
+            )
+        </if>
+        <if test="type != 'doTask'">
+            and cFMTypeId = #{typeId}
+        </if>
+    </select>
 </mapper>

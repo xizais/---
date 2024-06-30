@@ -668,6 +668,20 @@ public class CollectInfoServiceImpl implements CollectInfoService {
         return result;
     }
 
+    @Override
+    public List<JSONObject> getTableFiled(int iIFId) {
+        // 返回表单字段数据字段数据
+        return infoformcreateMapper.getFromField(iIFId);
+    }
+
+    @Override
+    public List<JSONObject> getFromAllData(int iIFId) {
+        // 获取表名称
+        String tableName = getDataTableName(iIFId);
+        // 获取所有数据
+        return infoformcreateMapper.getFromAllData(tableName);
+    }
+
     private void insertFromDataPerson(Integer iIFId, JSONArray codes, JSONArray names, JSONArray orgs) {
         // 查看是否是发布中
         Infoform infoform = infoformMapper.selectById(iIFId);

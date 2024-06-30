@@ -135,9 +135,17 @@ public class PersoninfoServiceImpl extends ServiceImpl<PersoninfoMapper, Personi
     @Override
     public void checkAuth() {
         // 获取用户信息
-        if (!getCurPerInfo().getString("code").equals(sysManager)) {
+        if (!isSysManager()) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"非系统管理员无权操作！");
         }
+    }
+
+    @Override
+    public boolean isSysManager() {
+        if (!getCurPerInfo().getString("code").equals(sysManager)) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -77,6 +77,21 @@
     <select id="getPersonData" resultType="com.alibaba.fastjson.JSONObject">
         select * from ${tableName} where dataState = 0 and code = #{code}
     </select>
+    <select id="getFromField" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT 'code' AS filed, '人员编码' AS filedName
+            UNION
+        SELECT 'name' AS filed, '人员名称' AS filedName
+            UNION
+        SELECT 'cState' AS filed, '状态' AS filedName
+            UNION
+        SELECT
+            CONCAT(type, '-', id) AS filed, title filedName
+        FROM infoformcreate
+            WHERE iIFC_iIFId = #{iIFId} AND type NOT IN ('text', 'container')
+    </select>
+    <select id="getFromAllData" resultType="com.alibaba.fastjson.JSONObject">
+        select * from ${tableName} where dataState = '0'
+    </select>
     <update id="deleteFromDataTable">
         DROP TABLE IF EXISTS `${tableName}`;
     </update>

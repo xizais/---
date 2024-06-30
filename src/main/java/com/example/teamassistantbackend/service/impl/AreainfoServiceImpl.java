@@ -126,6 +126,7 @@ public class AreainfoServiceImpl extends ServiceImpl<AreainfoMapper, Areainfo>
         JSONObject result = new JSONObject();
         result.put("infoList",infoList);
         result.put("amount",amount);
+        result.put("isSysManager",personinfoService.isSysManager());
         return result;
     }
 

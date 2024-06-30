@@ -34,6 +34,10 @@ public interface InfoformcreateMapper extends BaseMapper<Infoformcreate> {
 
     JSONObject selectFromDataOne(@Param(value = "tableName")String tableName,@Param(value = "id") int id);
     JSONObject getPersonData(@Param(value = "tableName")String tableName,@Param(value = "code") String code);
+
+    List<JSONObject> getFromField(int iIFId); // 获取表单字段
+
+    List<JSONObject> getFromAllData(String tableName); // 获取表单所有数据
 }
 
 

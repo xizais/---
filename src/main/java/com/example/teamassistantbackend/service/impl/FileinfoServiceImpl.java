@@ -12,6 +12,7 @@ import com.example.teamassistantbackend.mapper.FilemanagerMapper;
 import com.example.teamassistantbackend.service.FileinfoService;
 import com.example.teamassistantbackend.mapper.FileinfoMapper;
 import com.example.teamassistantbackend.service.PersoninfoService;
+import com.example.teamassistantbackend.utils.FileUtils;
 import com.example.teamassistantbackend.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
@@ -34,11 +34,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 /**
 * @author huang
 * @description 针对表【fileinfo(文件信息表)】的数据库操作Service实现
@@ -351,6 +353,184 @@ public class FileinfoServiceImpl extends ServiceImpl<FileinfoMapper, Fileinfo>
         JSONObject jsonResult = new JSONObject();
         jsonResult.put("message", "导入成功!");
         return jsonResult;
+    }
+
+    @Override
+    public JSONObject handleTaskZipFile(int iTMId) throws Exception {
+        String fileName = System.currentTimeMillis() + "_FileGenerate";
+        String sourceFilePath = homePath + "generate" + File.separator + "task" + File.separator + fileName + File.separator;
+        String targetPath = homePath + "generate" + File.separator + "task" + File.separator + iTMId + "_" + fileName + File.separator;
+
+        createFolderIfNotExists(sourceFilePath); // 创建文件夹
+        createFolderIfNotExists(targetPath); // 创建文件夹
+
+        // 获取文件信息
+        List<JSONObject> files = filemanagerMapper.getFileInfoList(iTMId,"doTask");
+
+        // 将文件信息转移到sourceFilePath路径下
+        for (JSONObject fileInfo : files) {
+            String tempFileName = fileInfo.getString("cFIFileName");
+            if (FileUtils.isFileExists(sourceFilePath + tempFileName)) {
+                tempFileName = System.currentTimeMillis() + "_" + tempFileName;
+            }
+            FileUtils.copyOrMoveFile(homePath + fileInfo.getString("cFIFilePath"),sourceFilePath + tempFileName,false);
+        }
+
+        createZipFile(sourceFilePath, targetPath, fileName + ".zip");
+
+        // 删除临时源文件
+        File folder = new File(sourceFilePath);
+        deleteFolder(folder);
+
+        JSONObject fileInfo = new JSONObject();
+        fileInfo.put("fileName",fileName+".zip");
+        fileInfo.put("filePath",targetPath);
+        return fileInfo;
+    }
+
+    @Override
+    public void deleteFolder(File folder) {
+        if (folder.exists()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        deleteFolder(file); // 递归删除子文件夹
+                    } else {
+                        file.delete(); // 删除文件
+                    }
+                }
+            }
+            folder.delete(); // 删除目录
+        }
+    }
+
+    /**
+     * @param sourceFilePath 待压缩文件（夹）路径
+     * @param targetPath 压缩文件所在目录
+     * @param zipFileName 压缩后的文件名称{.zip结尾}
+     * @return
+     * @Description: 创建zip文件
+     */
+    public static boolean createZipFile(String sourceFilePath, String targetPath, String zipFileName) throws Exception{
+
+        boolean flag = false;
+        FileOutputStream fos = null;
+        ZipOutputStream zos = null;
+
+        // 要压缩的文件资源
+        File sourceFile = new File(sourceFilePath);
+        // zip文件存放路径
+        String zipPath = "";
+
+        File TempFilePath = new File(targetPath);
+        if (!TempFilePath.exists()) {
+            TempFilePath.mkdirs();
+        }
+
+        if(null != targetPath && !"".equals(targetPath)){
+            zipPath = targetPath + File.separator + zipFileName;
+        } else {
+            zipPath = new File(sourceFilePath).getParent() + File.separator + zipFileName;
+        }
+
+        if (!sourceFile.exists()) {
+            throw  new Exception("待压缩的文件目录：" + sourceFilePath + "不存在.");
+        }
+
+        try {
+            File zipFile = new File(zipPath);
+            if (zipFile.exists()) {
+                throw  new Exception(zipPath + "目录下存在名字为:" + zipFileName + ".zip" + "打包文件.");
+            } else {
+                File[] sourceFiles = sourceFile.listFiles();
+                fos = new FileOutputStream(zipPath);
+                zos = new ZipOutputStream(new BufferedOutputStream(fos));
+                // 生成压缩文件
+                writeZip(sourceFile, "", zos);
+                flag = true;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            //关闭流
+            try {
+                if (null != zos) {
+                    zos.close();
+                }
+                if (null != fos){
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * @param file
+     * @param parentPath
+     * @param zos
+     * @Description:
+     */
+    private static void writeZip(File file, String parentPath, ZipOutputStream zos) throws Exception {
+        if (file.exists()) {
+            // 处理文件夹
+            if (file.isDirectory()) {
+                parentPath += file.getName() + File.separator;
+                File[] files = file.listFiles();
+                if (files.length != 0) {
+                    for (File f : files) {
+                        // 递归调用
+                        writeZip(f, parentPath, zos);
+                    }
+                } else {
+                    // 空目录则创建当前目录的ZipEntry
+                    try {
+                        zos.putNextEntry(new ZipEntry(parentPath));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(file);
+                    ZipEntry ze = new ZipEntry(parentPath + file.getName());
+                    zos.putNextEntry(ze);
+                    byte[] content = new byte[1024];
+                    int len;
+                    while ((len = fis.read(content)) != -1) {
+                        zos.write(content, 0, len);
+                        zos.flush();
+                    }
+                } catch (FileNotFoundException e) {
+                    throw  new Exception("创建ZIP文件失败", e);
+                } catch (IOException e) {
+                    throw  new Exception("创建ZIP文件失败", e);
+                } finally {
+                    try {
+                        if (fis != null) {
+                            fis.close();
+                        }
+                    } catch (IOException e) {
+                        throw  new Exception("创建ZIP文件失败", e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void createFolderIfNotExists(String folderPath) {
+        File folder = new File(folderPath);
+        if (!folder.exists()) {
+            try {
+                folder.mkdirs();
+            } catch (Exception e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+            }
+        }
     }
 
     /**

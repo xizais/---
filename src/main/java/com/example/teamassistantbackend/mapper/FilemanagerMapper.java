@@ -1,8 +1,11 @@
 package com.example.teamassistantbackend.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.teamassistantbackend.entity.Filemanager;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author huang
@@ -13,6 +16,8 @@ import org.apache.ibatis.annotations.Param;
 public interface FilemanagerMapper extends BaseMapper<Filemanager> {
 
     void updateTypeId(@Param("fileDoIds") String fileDoIds,@Param("typeId") Integer typeId);
+
+    List<JSONObject> getFileInfoList(@Param(value = "typeId") int cFMTypeId,@Param("type") String cFMType); // 获取文件信息
 }
 
 

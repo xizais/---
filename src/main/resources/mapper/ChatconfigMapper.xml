@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.ChatconfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Chatconfig">
+            <id property="iCCId" column="iCCId" jdbcType="INTEGER"/>
+            <result property="cCCName" column="cCCName" jdbcType="VARCHAR"/>
+            <result property="cCCSelfCode" column="cCCSelfCode" jdbcType="VARCHAR"/>
+            <result property="cCCOtherCode" column="cCCOtherCode" jdbcType="VARCHAR"/>
+            <result property="dCreateTime" column="dCreateTime" jdbcType="TIMESTAMP"/>
+            <result property="dUpdateTime" column="dUpdateTime" jdbcType="TIMESTAMP"/>
+            <result property="bIsShow" column="bIsShow" jdbcType="BIT"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        iCCId,cCCName,cCCSelfCode,
+        cCCOtherCode,dCreateTime,dUpdateTime,
+        bIsShow,dataState
+    </sql>
+    <select id="getMessageConfig" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            iCCId id,
+            cCCName name,
+            DATE_FORMAT(dCreateTime, '%m-%d %H:%i:%s') AS time,
+            cCCSelfCode,
+            cCCOtherCode
+        from
+            Chatconfig cc
+        where cc.dataState = '0' and cc.bIsShow = 1
+        and cc.cCCSelfCode = #{code}
+        order by dUpdateTime desc
+    </select>
+</mapper>

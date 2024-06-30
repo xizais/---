@@ -26,4 +26,5 @@ public interface PersoninfoService extends IService<Personinfo> {
     JSONObject deletePerInfo(JSONObject request); // 删除用户信息
 
     void checkAuth(); // 鉴权
+    boolean isSysManager(); // 是否系统管理员
 }

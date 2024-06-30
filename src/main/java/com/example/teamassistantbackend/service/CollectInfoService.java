@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public interface CollectInfoService {
     public JSONObject saveCollectInfo(ArrayList<HashMap<String,Object>> containers, boolean isAdd, int iIFId, String title);
@@ -33,4 +34,8 @@ public interface CollectInfoService {
     public JSONObject saveFromPersonData(JSONObject request);
 
     public JSONObject getFromDataId(JSONObject request);
+
+    List<JSONObject> getTableFiled(int iIFId); // 获取表单字段数据
+
+    List<JSONObject> getFromAllData(int iIFId); // 获取表单所有数据
 }

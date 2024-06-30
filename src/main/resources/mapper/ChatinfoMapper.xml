@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.teamassistantbackend.mapper.ChatinfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.teamassistantbackend.entity.Chatinfo">
+            <id property="cCIId" column="cCIId" jdbcType="INTEGER"/>
+            <result property="cCISelfCode" column="cCISelfCode" jdbcType="VARCHAR"/>
+            <result property="cCIOtherCode" column="cCIOtherCode" jdbcType="VARCHAR"/>
+            <result property="cCIContent" column="cCIContent" jdbcType="VARCHAR"/>
+            <result property="dCISendTime" column="dCISendTime" jdbcType="TIMESTAMP"/>
+            <result property="cCIState" column="cCIState" jdbcType="VARCHAR"/>
+            <result property="dataState" column="dataState" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cCIId,cCISelfCode,cCIOtherCode,
+        cCIContent,dCISendTime,cCIState,
+        dataState
+    </sql>
+    <select id="getMessageInfo" resultType="com.alibaba.fastjson.JSONObject">
+        select
+            cCIId,
+            case
+                cCISelfCode when #{cCCSelfCode} then '1'
+                            when #{cCCOtherCode} then '0'
+                end as id,
+            case
+                cCISelfCode when #{cCCSelfCode} then #{selfName}
+                when #{cCCOtherCode} then #{otherName}
+            end as name,
+            DATE_FORMAT(dCISendTime, '%m-%d %H:%i:%s') AS time,
+            cCIContent info
+        from chatinfo
+        where dataState = '0'
+        and (
+            (cCISelfCode = #{cCCSelfCode} and cCIOtherCode = #{cCCOtherCode})
+            or (cCISelfCode = #{cCCOtherCode} and cCIOtherCode = #{cCCSelfCode})
+        )
+    </select>
+</mapper>
